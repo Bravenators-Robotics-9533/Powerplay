@@ -45,11 +45,6 @@ public class MecanumDriveHardware {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
-        // TODO: Define any reversed motors
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void SetMotorPower(DcMotorEx motor, double power) {
