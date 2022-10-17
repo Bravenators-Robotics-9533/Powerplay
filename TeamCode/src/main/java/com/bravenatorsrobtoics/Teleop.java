@@ -60,6 +60,9 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     // Declare OpMode members.
     private MecanumDriveHardware hardware;
     private MecanumDriver driver;
+    private LiftController liftController;
+
+    private boolean isOpen = false;
 
     @Override
     public void runOpMode() {
@@ -68,6 +71,7 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
         hardware = new MecanumDriveHardware(hardwareMap);
         driver = new MecanumDriver(this, hardware);
+        liftController = new LiftController(this);
 
         driverGamePad = new FtcGamePad("Driver GamePad", gamepad1, this::OnDriverGamePadChange);
         operatorGamePad = new FtcGamePad("Operator GamePad", gamepad2, this::OnOperatorGamePadChange);
@@ -79,6 +83,9 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
         while(opModeIsActive()) {
             HandleDrive();
+
+            driverGamePad.update();
+            operatorGamePad.update();
         }
 
     }
@@ -106,7 +113,20 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     }
 
     private void OnOperatorGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
+        switch (button) {
 
+            case FtcGamePad.GAMEPAD_A:
+                if(pressed) {
+                    if(!isOpen) {
+                        liftController.OpenIntake();
+                    }
+                } else {
+                    liftController.CloseIntake();
+                }
+
+                break;
+
+        }
     }
 
 }

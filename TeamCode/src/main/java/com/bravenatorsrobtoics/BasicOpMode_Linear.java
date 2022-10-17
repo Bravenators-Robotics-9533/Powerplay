@@ -59,6 +59,15 @@ public class BasicOpMode_Linear extends LinearOpMode {
     private MecanumDriveHardware hardware;
     private MecanumDriver driver;
 
+    private static final int OPEN_POSITION = 42;
+
+    private void WaitMillis(int millis) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        while(opModeIsActive() && timer.milliseconds() <= millis);
+    }
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -67,9 +76,25 @@ public class BasicOpMode_Linear extends LinearOpMode {
         hardware = new MecanumDriveHardware(hardwareMap);
         driver = new MecanumDriver(this, hardware);
 
+        DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         waitForStart();
 
-        driver.DriveByInches(24, 0.45);
+        intake.setTargetPosition(42);
+        intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        intake.setPower(1);
+
+        while(opModeIsActive() && intake.isBusy());
+
+        WaitMillis(1500);
+
+        intake.setPower(0);
+        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while(opModeIsActive());
 
 //        while (opModeIsActive()) {
 //
