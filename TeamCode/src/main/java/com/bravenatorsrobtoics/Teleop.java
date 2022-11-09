@@ -52,6 +52,8 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Teleop", group="Linear Opmode")
 public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
+    private static final boolean USE_MASTER_CONTROLLER = true;
+
     private static final double MAX_ROBOT_SPEED = 0.75;
 
     private FtcGamePad driverGamePad;
@@ -61,8 +63,6 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     private MecanumDriveHardware hardware;
     private MecanumDriver driver;
     private LiftController liftController;
-
-    private boolean isOpen = false;
 
     @Override
     public void runOpMode() {
@@ -85,7 +85,12 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
             HandleDrive();
 
             driverGamePad.update();
-            operatorGamePad.update();
+
+            if(!USE_MASTER_CONTROLLER)
+                operatorGamePad.update();
+
+            // Update Controllers
+            liftController.Update();
         }
 
     }
@@ -109,7 +114,8 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     }
 
     private void OnDriverGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
-
+        if(USE_MASTER_CONTROLLER)
+            OnOperatorGamePadChange(gamePad, button, pressed);
     }
 
     private void OnOperatorGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
@@ -117,14 +123,17 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
             case FtcGamePad.GAMEPAD_A:
                 if(pressed) {
-                    if(!isOpen) {
-                        liftController.OpenIntake();
-                    }
+                    liftController.OpenIntake();
                 } else {
                     liftController.CloseIntake();
                 }
 
                 break;
+
+            case FtcGamePad.GAMEPAD_DPAD_LEFT:
+                if(pressed) {
+                    liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+                }
 
         }
     }
