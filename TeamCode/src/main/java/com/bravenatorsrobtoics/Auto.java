@@ -29,13 +29,12 @@
 
 package com.bravenatorsrobtoics;
 
+import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
+import com.bravenatorsrobtoics.drive.MecanumDriver;
+import com.bravenatorsrobtoics.subcomponent.LiftController;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -51,33 +50,30 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Lift Encoder Test", group="Linear Opmode")
-public class BasicOpMode_Linear extends LinearOpMode {
+@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
+@Disabled
+public class Auto extends LinearOpMode {
 
-    // Declare OpMode members.
-
-    private DcMotorEx lift;
+    private MecanumDriveHardware hardware;
+    private MecanumDriver driver;
+    private LiftController liftController;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        lift = hardwareMap.get(DcMotorEx.class, "lift");
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        hardware = new MecanumDriveHardware(hardwareMap);
+        driver = new MecanumDriver(this, hardware);
+        liftController = new LiftController(this);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        // Autonomous Code
 
-            lift.setPower(gamepad1.left_stick_y);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Lift Position", lift.getCurrentPosition());
-            telemetry.update();
-        }
     }
 }

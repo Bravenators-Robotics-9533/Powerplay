@@ -1,8 +1,9 @@
-package com.bravenatorsrobtoics;
+package com.bravenatorsrobtoics.subcomponent;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class LiftController {
@@ -17,8 +18,9 @@ public class LiftController {
 
     public enum LiftStage {
         GROUND(0),
-        LOW(200),
-        HIGH(400);
+        LOW(4265),
+        MID(6895),
+        HIGH(6895);
 
         final int encoderValue;
 
@@ -31,9 +33,10 @@ public class LiftController {
         this.opMode = opMode;
 
         liftMotor = opMode.hardwareMap.get(DcMotorEx.class, "lift");
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
     }

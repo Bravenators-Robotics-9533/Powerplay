@@ -30,7 +30,10 @@
 package com.bravenatorsrobtoics;
 
 import com.bravenatorsrobtoics.common.FtcGamePad;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.bravenatorsrobtoics.config.Config;
+import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
+import com.bravenatorsrobtoics.drive.MecanumDriver;
+import com.bravenatorsrobtoics.subcomponent.LiftController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
@@ -52,8 +55,6 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Teleop", group="Linear Opmode")
 public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
-    private static final boolean USE_MASTER_CONTROLLER = true;
-
     private static final double MAX_ROBOT_SPEED = 0.75;
 
     private FtcGamePad driverGamePad;
@@ -64,10 +65,15 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     private MecanumDriver driver;
     private LiftController liftController;
 
+    private boolean shouldUseMasterController = false;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initializing");
         telemetry.update();
+
+        Config config = new Config(hardwareMap.appContext);
+        shouldUseMasterController = config.IsSingleControllerOverride();
 
         hardware = new MecanumDriveHardware(hardwareMap);
         driver = new MecanumDriver(this, hardware);
@@ -86,7 +92,7 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
             driverGamePad.update();
 
-            if(!USE_MASTER_CONTROLLER)
+            if(!shouldUseMasterController)
                 operatorGamePad.update();
 
             // Update Controllers
@@ -97,8 +103,8 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
     private void HandleDrive() {
         double v = -Math.pow(gamepad1.left_stick_y, 3);
-        double h = -Math.pow(gamepad1.left_stick_x, 3) + Math.pow(driverGamePad.getLeftTrigger(), 3)
-                    - Math.pow(driverGamePad.getRightTrigger(), 3);
+        double h = Math.pow(gamepad1.left_stick_x, 3) - Math.pow(driverGamePad.getLeftTrigger(), 3)
+                    + Math.pow(driverGamePad.getRightTrigger(), 3);
         double r = Math.pow(gamepad1.right_stick_x, 3);
 
         v = Range.clip(v, -MAX_ROBOT_SPEED, MAX_ROBOT_SPEED);
@@ -114,7 +120,7 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     }
 
     private void OnDriverGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
-        if(USE_MASTER_CONTROLLER)
+        if(shouldUseMasterController)
             OnOperatorGamePadChange(gamePad, button, pressed);
     }
 
@@ -130,10 +136,29 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
                 break;
 
+            // Lift Stage Down
+            case FtcGamePad.GAMEPAD_DPAD_DOWN:
+                if(pressed)
+                    liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
+                break;
+
+            // Lift Stage Low
             case FtcGamePad.GAMEPAD_DPAD_LEFT:
-                if(pressed) {
+                if(pressed)
+                    liftController.GoToLiftStage(LiftController.LiftStage.LOW);
+                break;
+
+            // Lift Stage Mid
+            case FtcGamePad.GAMEPAD_DPAD_UP:
+                if(pressed)
+                    liftController.GoToLiftStage(LiftController.LiftStage.MID);
+                break;
+
+            // Lift Stage High
+            case FtcGamePad.GAMEPAD_DPAD_RIGHT:
+                if(pressed)
                     liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
-                }
+                break;
 
         }
     }
