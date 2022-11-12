@@ -67,6 +67,8 @@ public class Auto extends LinearOpMode {
         while(opModeIsActive() && timer.milliseconds() <= millis);
     }
 
+    private static final double MOVE_SPEED = 0.6;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -82,6 +84,9 @@ public class Auto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        while(opModeIsActive())
+            System.out.println(hardware.frontLeft.getTargetPositionTolerance());
+
         // Autonomous Code
 //        liftController.CloseIntake();
 //
@@ -91,9 +96,9 @@ public class Auto extends LinearOpMode {
 //
 //        WaitMillis(1000);
 //
-//        driver.DriveByInches(30.5, 0.5);
+//        driver.DriveByInches(29, MOVE_SPEED);
 
-        driver.DriveByInches(24, 0.5);
+
 
     }
 }

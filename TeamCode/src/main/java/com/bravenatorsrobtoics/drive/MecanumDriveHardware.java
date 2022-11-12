@@ -38,10 +38,15 @@ public class MecanumDriveHardware {
         this.backLeft = hardwareMap.get(DcMotorEx.class, "bl");
         this.backRight = hardwareMap.get(DcMotorEx.class, "br");
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        frontLeft.setTargetPositionTolerance(10);
+        frontRight.setTargetPositionTolerance(10);
+        backLeft.setTargetPositionTolerance(10);
+        backRight.setTargetPositionTolerance(10);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode                     = BNO055IMU.SensorMode.IMU;
