@@ -4,6 +4,7 @@ import android.graphics.drawable.GradientDrawable;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -36,6 +37,11 @@ public class MecanumDriveHardware {
         this.frontRight = hardwareMap.get(DcMotorEx.class, "fr");
         this.backLeft = hardwareMap.get(DcMotorEx.class, "bl");
         this.backRight = hardwareMap.get(DcMotorEx.class, "br");
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode                     = BNO055IMU.SensorMode.IMU;

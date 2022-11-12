@@ -18,6 +18,7 @@ public class LiftController {
 
     public enum LiftStage {
         GROUND(0),
+        SLIGHTLY_RAISED(500),
         LOW(4265),
         MID(6895),
         HIGH(6895);
@@ -39,6 +40,7 @@ public class LiftController {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
+        intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
     }
 
     public void OpenIntake() {

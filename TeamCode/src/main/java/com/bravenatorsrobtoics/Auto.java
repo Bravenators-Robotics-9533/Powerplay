@@ -32,9 +32,12 @@ package com.bravenatorsrobtoics;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
+import com.qualcomm.hardware.ams.AMSColorSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 /**
@@ -50,12 +53,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Autonomous", group="Linear Opmode")
+@Autonomous(name="Autonomous", group="Linear Opmode")
 public class Auto extends LinearOpMode {
 
     private MecanumDriveHardware hardware;
     private MecanumDriver driver;
     private LiftController liftController;
+
+    private void WaitMillis(int millis) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        while(opModeIsActive() && timer.milliseconds() <= millis);
+    }
 
     @Override
     public void runOpMode() {
@@ -73,6 +83,17 @@ public class Auto extends LinearOpMode {
         waitForStart();
 
         // Autonomous Code
+//        liftController.CloseIntake();
+//
+//        WaitMillis(500);
+//
+//        liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
+//
+//        WaitMillis(1000);
+//
+//        driver.DriveByInches(30.5, 0.5);
+
+        driver.DriveByInches(24, 0.5);
 
     }
 }
