@@ -84,8 +84,7 @@ public class Auto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        while(opModeIsActive())
-            System.out.println(hardware.frontLeft.getTargetPositionTolerance());
+        driver.TurnDegrees(MecanumDriver.TurnDirection.CLOCKWISE, 10, 0.5);
 
         // Autonomous Code
 //        liftController.CloseIntake();

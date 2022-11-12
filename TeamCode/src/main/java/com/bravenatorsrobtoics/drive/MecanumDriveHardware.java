@@ -75,7 +75,7 @@ public class MecanumDriveHardware {
     }
 
     public double GetCurrentHeading() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        Orientation angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
 

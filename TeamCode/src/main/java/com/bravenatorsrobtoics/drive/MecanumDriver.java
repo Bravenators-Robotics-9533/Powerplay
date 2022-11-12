@@ -14,6 +14,11 @@ public class MecanumDriver {
 
     private final Telemetry telemetry;
 
+    public enum TurnDirection {
+        COUNTER_CLOCKWISE,
+        CLOCKWISE
+    }
+
     public MecanumDriver(LinearOpMode opMode, MecanumDriveHardware hardware) {
         this.opMode = opMode;
         this.telemetry = opMode.telemetry;
@@ -42,9 +47,6 @@ public class MecanumDriver {
     }
 
     public void DriveByIntervals(double v, double h, double r) {
-        // h = x
-        // v = y
-
         double theta = Math.atan2(v, h);
         double power = Math.hypot(h, v);
 
@@ -139,13 +141,7 @@ public class MecanumDriver {
             double blPower = power;
             double brPower = power;
 
-//            telemetry.addData("Fl Progress", flProgress);
-//            telemetry.addData("FR Progress", frProgress);
-//            telemetry.addData("BL Progress", blProgress);
-//            telemetry.addData("BR Progress", brProgress);
-//            telemetry.update();
-
-//          // Low Clip FL
+          // Low Clip FL
             if(flProgress <= LOW_CLIP) {
                 float normalizedProgress = 1 - (flProgress * LOW_CLIP_MULTIPLIER); // Normalize from 1 to 0
                 flPower -= normalizedProgress * flPower;
@@ -193,8 +189,6 @@ public class MecanumDriver {
                 brPower -= normalizedProgress * brPower;
             }
 
-            telemetry.update();
-
             hardware.SetMotorPower(hardware.frontLeft, Math.max(SLOW_SPEED_MIN, flPower));
             hardware.SetMotorPower(hardware.frontRight, Math.max(SLOW_SPEED_MIN, frPower));
             hardware.SetMotorPower(hardware.backLeft, Math.max(SLOW_SPEED_MIN, blPower));
@@ -204,6 +198,15 @@ public class MecanumDriver {
         hardware.StopAllMotors();
 
         SetRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void TurnDegrees(TurnDirection turnDirection, int degrees, double power) {
+        double initialHeading = hardware.GetCurrentHeading();
+
+        while(opMode.opModeIsActive()) {
+            telemetry.addData("Delta Heading", hardware.GetCurrentHeading());
+            telemetry.update();
+        }
     }
 
 }
