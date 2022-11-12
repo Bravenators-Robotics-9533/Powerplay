@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Teleop", group="Linear Opmode")
 public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
-    private static final double MAX_ROBOT_SPEED = 0.75;
+    private static final double MAX_ROBOT_SPEED = 0.50;
 
     private FtcGamePad driverGamePad;
     private FtcGamePad operatorGamePad;
