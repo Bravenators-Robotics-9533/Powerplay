@@ -3,7 +3,6 @@ package com.bravenatorsrobtoics.drive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.vuforia.SmartTerrain;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -46,7 +45,7 @@ public class MecanumDriver {
         return max != 0 ? value / max : 0;
     }
 
-    public void DriveByIntervals(double v, double h, double r) {
+    public void Drive(double v, double h, double r) {
         double theta = Math.atan2(v, h);
         double power = Math.hypot(h, v);
 
@@ -72,46 +71,29 @@ public class MecanumDriver {
         hardware.SetMotorPower(hardware.backRight, rightRear);
     }
 
-//    public void DriveByIntervals(double v, double h, double r) {
-//        // Calculate Motors Speeds
-//        double frontLeft    = v - h + r;
-//        double frontRight   = v + h - r;
-//        double backRight    = v - h - r;
-//        double backLeft     = v + h + r;
-//
-//        // Limit the vectors to under 1
-//        double max = Math.max(
-//                Math.abs(backLeft),
-//                Math.max(
-//                        Math.abs(backRight),
-//                        Math.max(
-//                                Math.abs(frontLeft), Math.abs(frontRight)
-//                        )
-//                )
-//        );
-//
-//        // Scale the power
-//        if(max > 1) { // Only scale if max is greater than one
-//            frontLeft   = ScalePower(frontLeft, max);
-//            frontRight  = ScalePower(frontRight, max);
-//            backLeft    = ScalePower(backLeft, max);
-//            backRight   = ScalePower(backRight, max);
-//        }
-//
-//        hardware.SetMotorPower(hardware.frontLeft, frontLeft);
-//        hardware.SetMotorPower(hardware.frontRight, frontRight);
-//        hardware.SetMotorPower(hardware.backLeft, backLeft);
-//        hardware.SetMotorPower(hardware.backRight, backRight);
-//    }
-
     private static final float LOW_CLIP = 0.2f;
     private static final float HIGH_CLIP = 0.5f;
-    private static final float LOW_CLIP_MULTIPLIER = 1.0f / LOW_CLIP;
 
     private static final float SLOW_SPEED_MIN = 0.1f;
 
+    /**
+     * @author Nick Fanelli
+     * @param absProgress total progress of the motor to target
+     * @param originalPower the (top speed) or target speed
+     * @return the eased value
+     */
+    protected double EaseInOut(float absProgress, double originalPower) {
+        return (absProgress <= MecanumDriver.LOW_CLIP) ? (originalPower - ((1 - (absProgress * (1.0 / MecanumDriver.LOW_CLIP))) * originalPower))
+                : ((absProgress >= MecanumDriver.HIGH_CLIP) ? (originalPower - (((absProgress - MecanumDriver.HIGH_CLIP) / (1 - MecanumDriver.HIGH_CLIP)) * originalPower)) : (originalPower));
+    }
+
     public void DriveByInches(double inches, double power) {
-        int ticksToMove = (int) (inches * MecanumDriveHardware.ENCODER_TICKS_PER_INCH);
+        DriveByInches(inches, inches, power);
+    }
+
+    public void DriveByInches(double leftInches, double rightInches, double power) {
+        int ticksToMoveLeft = (int) (leftInches * MecanumDriveHardware.ENCODER_TICKS_PER_INCH);
+        int ticksToMoveRight = (int) (rightInches * MecanumDriveHardware.ENCODER_TICKS_PER_INCH);
 
         // Calculate Initial Positions
         int flInitialPosition = hardware.frontLeft.getCurrentPosition();
@@ -119,81 +101,40 @@ public class MecanumDriver {
         int blInitialPosition = hardware.backLeft.getCurrentPosition();
         int brInitialPosition = hardware.backRight.getCurrentPosition();
 
+        int flTargetPosition = flInitialPosition + ticksToMoveLeft;
+        int frTargetPosition = frInitialPosition + ticksToMoveRight;
+        int blTargetPosition = blInitialPosition + ticksToMoveLeft;
+        int brTargetPosition = brInitialPosition + ticksToMoveRight;
+
         // Set the target positions
-        AddToTargetPosition(hardware.frontLeft, ticksToMove);
-        AddToTargetPosition(hardware.frontRight, ticksToMove);
-        AddToTargetPosition(hardware.backLeft, ticksToMove);
-        AddToTargetPosition(hardware.backRight, ticksToMove);
+        hardware.frontLeft.setTargetPosition(flTargetPosition);
+        hardware.frontRight.setTargetPosition(frTargetPosition);
+        hardware.backLeft.setTargetPosition(blTargetPosition);
+        hardware.backRight.setTargetPosition(brTargetPosition);
 
         // Change the run mode
         SetRunMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        while(opMode.opModeIsActive() && IsBusy()) {
+        do {
+            if(!opMode.opModeIsActive())
+                break;
 
             // Calculate the progress from 0 to 1
-            float flProgress = (hardware.frontLeft.getCurrentPosition() - flInitialPosition) / (float) ticksToMove;
-            float frProgress = (hardware.frontRight.getCurrentPosition() - frInitialPosition) / (float) ticksToMove;
-            float blProgress = (hardware.backLeft.getCurrentPosition() - blInitialPosition) / (float) ticksToMove;
-            float brProgress = (hardware.backRight.getCurrentPosition() - brInitialPosition) / (float) ticksToMove;
+            float flProgress = (hardware.frontLeft.getCurrentPosition() - flInitialPosition) / (float) ticksToMoveLeft;
+            float frProgress = (hardware.frontRight.getCurrentPosition() - frInitialPosition) / (float) ticksToMoveRight;
+            float blProgress = (hardware.backLeft.getCurrentPosition() - blInitialPosition) / (float) ticksToMoveLeft;
+            float brProgress = (hardware.backRight.getCurrentPosition() - brInitialPosition) / (float) ticksToMoveRight;
 
-            double flPower = power;
-            double frPower = power;
-            double blPower = power;
-            double brPower = power;
-
-          // Low Clip FL
-            if(flProgress <= LOW_CLIP) {
-                float normalizedProgress = 1 - (flProgress * LOW_CLIP_MULTIPLIER); // Normalize from 1 to 0
-                flPower -= normalizedProgress * flPower;
-            }
-
-            // High Clip FL
-            if(flProgress >= HIGH_CLIP) {
-                float normalizedProgress = (flProgress - HIGH_CLIP) / (1 - HIGH_CLIP);
-                flPower -= normalizedProgress * flPower;
-            }
-
-            // Low Clip FR
-            if(frProgress <= LOW_CLIP) {
-                float normalizedProgress = 1 - (frProgress * LOW_CLIP_MULTIPLIER); // Normalize from 1 to 0
-                frPower -= normalizedProgress * frPower;
-            }
-
-            // High Clip FR
-            if(frProgress >= HIGH_CLIP) {
-                float normalizedProgress = (frProgress - HIGH_CLIP) / (1 - HIGH_CLIP);
-                frPower -= normalizedProgress * frPower;
-            }
-
-            // Low Clip BL
-            if(blProgress <= LOW_CLIP) {
-                float normalizedProgress = 1 - (blProgress * LOW_CLIP_MULTIPLIER); // Normalize from 1 to 0
-                blPower -= normalizedProgress * blPower;
-            }
-
-            // High Clip BL
-            if(blProgress >= HIGH_CLIP) {
-                float normalizedProgress = (blProgress - HIGH_CLIP) / (1 - HIGH_CLIP);
-                blPower -= normalizedProgress * blPower;
-            }
-
-            // Low Clip BR
-            if(brProgress <= LOW_CLIP) {
-                float normalizedProgress = 1 - (brProgress * LOW_CLIP_MULTIPLIER); // Normalize from 1 to 0
-                brPower -= normalizedProgress * brPower;
-            }
-
-            // High Clip BR
-            if(brProgress >= HIGH_CLIP) {
-                float normalizedProgress = (brProgress - HIGH_CLIP) / (1 - HIGH_CLIP);
-                brPower -= normalizedProgress * brPower;
-            }
+            double flPower = EaseInOut(flProgress, power);
+            double frPower = EaseInOut(frProgress, power);
+            double blPower = EaseInOut(blProgress, power);
+            double brPower = EaseInOut(brProgress, power);
 
             hardware.SetMotorPower(hardware.frontLeft, Math.max(SLOW_SPEED_MIN, flPower));
             hardware.SetMotorPower(hardware.frontRight, Math.max(SLOW_SPEED_MIN, frPower));
             hardware.SetMotorPower(hardware.backLeft, Math.max(SLOW_SPEED_MIN, blPower));
             hardware.SetMotorPower(hardware.backRight, Math.max(SLOW_SPEED_MIN, brPower));
-        }
+        } while(opMode.opModeIsActive() && IsBusy());
 
         hardware.StopAllMotors();
 
@@ -201,12 +142,13 @@ public class MecanumDriver {
     }
 
     public void TurnDegrees(TurnDirection turnDirection, int degrees, double power) {
-        double initialHeading = hardware.GetCurrentHeading();
+        // TODO: IF WORKS REMOVE THE PCC / 360 and put in the track distance instead
+        double distance = Math.abs(degrees * 2) * (MecanumDriveHardware.PIVOT_CIRCLE_CIRCUMFERENCE / 360.0);
 
-        while(opMode.opModeIsActive()) {
-            telemetry.addData("Delta Heading", hardware.GetCurrentHeading());
-            telemetry.update();
-        }
+        if(turnDirection == TurnDirection.CLOCKWISE)
+            distance = -distance;
+
+        DriveByInches(-distance, distance, power);
     }
 
 }

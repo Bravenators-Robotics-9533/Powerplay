@@ -33,10 +33,12 @@ import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
 import com.qualcomm.hardware.ams.AMSColorSensor;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -75,6 +77,9 @@ public class Auto extends LinearOpMode {
         telemetry.update();
 
         hardware = new MecanumDriveHardware(hardwareMap);
+        hardware.SetBulkUpdateMode(LynxModule.BulkCachingMode.AUTO);
+        hardware.SetZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
@@ -84,7 +89,17 @@ public class Auto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        driver.TurnDegrees(MecanumDriver.TurnDirection.CLOCKWISE, 10, 0.5);
+//        driver.TurnDegrees(MecanumDriver.TurnDirection.CLOCKWISE, 10, 0.5);
+
+        driver.DriveByInches(20, MOVE_SPEED);
+
+        WaitMillis(1000);
+
+        driver.DriveByInches(20, MOVE_SPEED);
+
+        WaitMillis(500);
+
+//        driver.TurnDegrees(MecanumDriver.TurnDirection.CLOCKWISE, 90, 0.5);
 
         // Autonomous Code
 //        liftController.CloseIntake();
@@ -96,7 +111,7 @@ public class Auto extends LinearOpMode {
 //        WaitMillis(1000);
 //
 //        driver.DriveByInches(29, MOVE_SPEED);
-
+//
 
 
     }

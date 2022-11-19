@@ -29,13 +29,17 @@
 
 package com.bravenatorsrobtoics;
 
+import android.widget.MultiAutoCompleteTextView;
+
 import com.bravenatorsrobtoics.common.FtcGamePad;
 import com.bravenatorsrobtoics.config.Config;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -53,9 +57,9 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Teleop", group="Linear Opmode")
-public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
+public class Teleop extends LinearOpMode {
 
-    private static final double MAX_ROBOT_SPEED = 0.50;
+    private static final double MAX_ROBOT_SPEED = 0.5;
 
     private FtcGamePad driverGamePad;
     private FtcGamePad operatorGamePad;
@@ -64,6 +68,8 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
     private MecanumDriveHardware hardware;
     private MecanumDriver driver;
     private LiftController liftController;
+
+    private float initialHeading = 0;
 
     private boolean shouldUseMasterController = false;
 
@@ -76,11 +82,16 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
         shouldUseMasterController = config.IsSingleControllerOverride();
 
         hardware = new MecanumDriveHardware(hardwareMap);
+        hardware.SetBulkUpdateMode(LynxModule.BulkCachingMode.MANUAL);
+        hardware.SetZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
         driverGamePad = new FtcGamePad("Driver GamePad", gamepad1, this::OnDriverGamePadChange);
         operatorGamePad = new FtcGamePad("Operator GamePad", gamepad2, this::OnOperatorGamePadChange);
+
+        initialHeading = (float) hardware.GetCurrentHeading();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -88,6 +99,9 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
         waitForStart();
 
         while(opModeIsActive()) {
+            // Clear Bulk Cache
+            hardware.ClearBulkCache();
+
             HandleDrive();
 
             driverGamePad.update();
@@ -101,22 +115,35 @@ public class Teleop extends LinearOpMode implements FtcGamePad.ButtonHandler {
 
     }
 
+    // Field Centric Driving
     private void HandleDrive() {
-        double v = -Math.pow(gamepad1.left_stick_y, 3);
-        double h = Math.pow(gamepad1.left_stick_x, 3) - Math.pow(driverGamePad.getLeftTrigger(), 3)
-                    + Math.pow(driverGamePad.getRightTrigger(), 3);
-        double r = Math.pow(gamepad1.right_stick_x, 3);
+        double y = Range.clip(Math.pow(-gamepad1.left_stick_y, 3), -1.0, 1.0);
+        double x = Range.clip(Math.pow(gamepad1.left_stick_x, 3)
+                + Math.pow(gamepad1.right_trigger, 3) - Math.pow(gamepad1.left_trigger, 3), -1.0, 1.0) * 1.1;
+        double rx = Range.clip(Math.pow(gamepad1.right_stick_x, 3), -1.0, 1.0);
 
-        v = Range.clip(v, -MAX_ROBOT_SPEED, MAX_ROBOT_SPEED);
-        h = Range.clip(h, -MAX_ROBOT_SPEED, MAX_ROBOT_SPEED);
-        r = Range.clip(r, -MAX_ROBOT_SPEED, MAX_ROBOT_SPEED);
+        // Read inverse IMU heading, as the UMG heading is CW positive
+        double botHeading = -hardware.GetCurrentHeading();
 
-        driver.DriveByIntervals(v, h, r);
-    }
+        double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
+        double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
 
-    @Override
-    public void gamepadButtonEvent(FtcGamePad gamepad, int button, boolean pressed) {
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (rotY + rotX + rx) / denominator;
+        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontRightPower = (rotY - rotX - rx) / denominator;
+        double backRightPower = (rotY + rotX - rx) / denominator;
 
+        hardware.SetMotorPower(hardware.frontLeft, frontLeftPower / (1 / MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.frontRight, frontRightPower / (1 / MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.backLeft, backLeftPower / (1 / MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.backRight, backRightPower / (1 / MAX_ROBOT_SPEED));
+
+        telemetry.addData("IMU", -hardware.GetCurrentHeading());
+        telemetry.update();
     }
 
     private void OnDriverGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
