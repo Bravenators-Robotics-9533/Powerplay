@@ -26,8 +26,8 @@ public class MecanumDriveHardware {
     public static final double ENCODER_TICKS_PER_INCH = (ENCODER_TICKS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                         (WHEEL_DIAMETER_INCHES * Math.PI);
 
-    public static final double TRACK_DISTANCE = 12.5;
-    public static final double PIVOT_CIRCLE_CIRCUMFERENCE = TRACK_DISTANCE * Math.PI;
+    public static final double TRACK_DISTANCE = 12.5; // 5.25
+    public static final double PIVOT_CIRCLE_CIRCUMFERENCE = (TRACK_DISTANCE / 2.0 * Math.PI) + (6.50 / 2.0 * Math.PI);
 
     public static final double MAX_MOTOR_VELOCITY = 2800;
 

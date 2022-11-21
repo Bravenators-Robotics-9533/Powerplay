@@ -32,6 +32,7 @@ package com.bravenatorsrobtoics;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
+import com.bravenatorsrobtoics.vision.VisionPathway;
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -62,6 +63,8 @@ public class Auto extends LinearOpMode {
     private MecanumDriver driver;
     private LiftController liftController;
 
+    private VisionPathway visionPathway;
+
     private void WaitMillis(int millis) {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -69,11 +72,11 @@ public class Auto extends LinearOpMode {
         while(opModeIsActive() && timer.milliseconds() <= millis);
     }
 
-    private static final double MOVE_SPEED = 0.6;
+    private static final double MOVE_SPEED = 0.5;
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Initializing");
         telemetry.update();
 
         hardware = new MecanumDriveHardware(hardwareMap);
@@ -83,36 +86,53 @@ public class Auto extends LinearOpMode {
         driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
+        visionPathway = new VisionPathway(this);
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        while(!isStarted()) {
+            visionPathway.UpdateDetections();
+            telemetry.addData("Parking Position", visionPathway.parkingPosition.name());
+            telemetry.update();
+        }
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-//        driver.TurnDegrees(MecanumDriver.TurnDirection.CLOCKWISE, 10, 0.5);
-
-        driver.DriveByInches(20, MOVE_SPEED);
-
-        WaitMillis(1000);
-
-        driver.DriveByInches(20, MOVE_SPEED);
-
+        // Autonomous Code
+        liftController.CloseIntake();
         WaitMillis(500);
 
-//        driver.TurnDegrees(MecanumDriver.TurnDirection.CLOCKWISE, 90, 0.5);
+        liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
+        WaitMillis(1000);
 
-        // Autonomous Code
-//        liftController.CloseIntake();
-//
-//        WaitMillis(500);
-//
-//        liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
-//
-//        WaitMillis(1000);
-//
-//        driver.DriveByInches(29, MOVE_SPEED);
-//
+        driver.StrafeByInches(-5, MOVE_SPEED / 2);
+        WaitMillis(1000);
 
+        driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
+        WaitMillis(1000);
 
+        driver.DriveByInches(24, MOVE_SPEED);
+        WaitMillis(1000);
+
+        liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+        WaitMillis(3000);
+
+        driver.StrafeByInches(17, MOVE_SPEED / 2.0);
+        WaitMillis(1000);
+
+        liftController.OpenIntake();
+        WaitMillis(500);
+
+        driver.StrafeByInches(-13, MOVE_SPEED / 2.0);
+        WaitMillis(1000);
+
+        liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
+        WaitMillis(1000);
+
+        driver.StrafeByInches(-30, MOVE_SPEED);
+
+        while(opModeIsActive() && liftController.IsLiftBusy()); // Wait for lift to finish
     }
 }

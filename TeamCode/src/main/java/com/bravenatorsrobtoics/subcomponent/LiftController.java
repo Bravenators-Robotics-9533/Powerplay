@@ -57,6 +57,8 @@ public class LiftController {
         liftMotor.setPower(1);
     }
 
+    public boolean IsLiftBusy() { return this.liftMotor.isBusy(); }
+
     public void Update() {}
 
 }

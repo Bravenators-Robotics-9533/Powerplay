@@ -1,5 +1,7 @@
 package com.bravenatorsrobtoics.drive;
 
+import android.sax.StartElementListener;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -141,14 +143,103 @@ public class MecanumDriver {
         SetRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    private static final double TURN_TOLERANCE = 0.975;
+
     public void TurnDegrees(TurnDirection turnDirection, int degrees, double power) {
-        // TODO: IF WORKS REMOVE THE PCC / 360 and put in the track distance instead
-        double distance = Math.abs(degrees * 2) * (MecanumDriveHardware.PIVOT_CIRCLE_CIRCUMFERENCE / 360.0);
+        int speedMultiplier = (turnDirection == TurnDirection.CLOCKWISE ? -1 : 1);
 
         if(turnDirection == TurnDirection.CLOCKWISE)
-            distance = -distance;
+            degrees *= -1;
 
-        DriveByInches(-distance, distance, power);
+        double deltaRadians = Math.toRadians(degrees);
+        double originalHeading = hardware.GetCurrentHeading(); // Radians
+        double targetHeading = originalHeading + deltaRadians;
+
+        while(opMode.opModeIsActive()) {
+            float absProgress = (float) Math.abs(((hardware.GetCurrentHeading() - originalHeading) / deltaRadians));
+
+            if(absProgress >= TURN_TOLERANCE)
+                break;
+
+            double easedPower = Math.max(SLOW_SPEED_MIN, EaseInOut(absProgress, power));
+
+            hardware.SetMotorPower(hardware.frontLeft, -easedPower * speedMultiplier);
+            hardware.SetMotorPower(hardware.frontRight, easedPower * speedMultiplier);
+            hardware.SetMotorPower(hardware.backLeft, -easedPower * speedMultiplier);
+            hardware.SetMotorPower(hardware.backRight, easedPower * speedMultiplier);
+        }
+
+//        hardware.StopAllMotors();
+//
+//        // Correction
+//        double finalHeading = hardware.GetCurrentHeading();
+//        double error = Math.abs(targetHeading - finalHeading);
+//
+//        while(opMode.opModeIsActive()) {
+//            float absProgress = (float) Math.abs(((hardware.GetCurrentHeading() - finalHeading) / error));
+//
+//            if(absProgress >= 1.0)
+//                break;
+//
+//            hardware.SetMotorPower(hardware.frontLeft, 0.04);
+//            hardware.SetMotorPower(hardware.frontRight, -0.04);
+//            hardware.SetMotorPower(hardware.backLeft, 0.04);
+//            hardware.SetMotorPower(hardware.backRight, -0.04);
+//        }
+
+        hardware.StopAllMotors();
+    }
+
+    public void StrafeByInches(double inches, double power) {
+        inches *= 0.9; // Slipping Correction
+
+        int ticksToMoveNegative = (int) (inches * MecanumDriveHardware.ENCODER_TICKS_PER_INCH);
+        int ticksToMovePositive = (int) (-inches * MecanumDriveHardware.ENCODER_TICKS_PER_INCH);
+
+        // Calculate Initial Positions
+        int flInitialPosition = hardware.frontLeft.getCurrentPosition();
+        int frInitialPosition = hardware.frontRight.getCurrentPosition();
+        int blInitialPosition = hardware.backLeft.getCurrentPosition();
+        int brInitialPosition = hardware.backRight.getCurrentPosition();
+
+        int flTargetPosition = flInitialPosition + ticksToMoveNegative;
+        int frTargetPosition = frInitialPosition + ticksToMovePositive;
+        int blTargetPosition = blInitialPosition + ticksToMovePositive;
+        int brTargetPosition = brInitialPosition + ticksToMoveNegative;
+
+        // Set the target positions
+        hardware.frontLeft.setTargetPosition(flTargetPosition);
+        hardware.frontRight.setTargetPosition(frTargetPosition);
+        hardware.backLeft.setTargetPosition(blTargetPosition);
+        hardware.backRight.setTargetPosition(brTargetPosition);
+
+        // Change the run mode
+        SetRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        do {
+            if(!opMode.opModeIsActive())
+                break;
+
+            // Calculate the progress from 0 to 1
+            float flProgress = (hardware.frontLeft.getCurrentPosition() - flInitialPosition) / (float) ticksToMoveNegative;
+            float frProgress = (hardware.frontRight.getCurrentPosition() - frInitialPosition) / (float) ticksToMovePositive;
+            float blProgress = (hardware.backLeft.getCurrentPosition() - blInitialPosition) / (float) ticksToMovePositive;
+            float brProgress = (hardware.backRight.getCurrentPosition() - brInitialPosition) / (float) ticksToMoveNegative;
+
+            double flPower = EaseInOut(flProgress, power);
+            double frPower = EaseInOut(frProgress, power);
+            double blPower = EaseInOut(blProgress, power);
+            double brPower = EaseInOut(brProgress, power);
+
+            hardware.SetMotorPower(hardware.frontLeft, Math.max(SLOW_SPEED_MIN, flPower));
+            hardware.SetMotorPower(hardware.frontRight, Math.max(SLOW_SPEED_MIN, frPower));
+            hardware.SetMotorPower(hardware.backLeft, Math.max(SLOW_SPEED_MIN, blPower));
+            hardware.SetMotorPower(hardware.backRight, Math.max(SLOW_SPEED_MIN, brPower));
+        } while(opMode.opModeIsActive() && IsBusy());
+
+        hardware.StopAllMotors();
+
+        SetRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 }
