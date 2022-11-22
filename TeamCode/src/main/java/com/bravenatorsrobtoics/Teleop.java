@@ -156,9 +156,7 @@ public class Teleop extends LinearOpMode {
 
             case FtcGamePad.GAMEPAD_A:
                 if(pressed) {
-                    liftController.OpenIntake();
-                } else {
-                    liftController.CloseIntake();
+                    liftController.ToggleIntake();
                 }
 
                 break;
@@ -172,19 +170,19 @@ public class Teleop extends LinearOpMode {
             // Lift Stage Low
             case FtcGamePad.GAMEPAD_DPAD_LEFT:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.LOW);
+                    liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
                 break;
 
             // Lift Stage Mid
             case FtcGamePad.GAMEPAD_DPAD_UP:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.MID);
+                    liftController.GoToLiftStage(LiftController.LiftStage.LOW);
                 break;
 
             // Lift Stage High
             case FtcGamePad.GAMEPAD_DPAD_RIGHT:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+                    liftController.GoToLiftStage(LiftController.LiftStage.MID);
                 break;
 
         }

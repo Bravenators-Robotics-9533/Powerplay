@@ -47,6 +47,13 @@ public class LiftController {
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
     }
 
+    public void ToggleIntake() {
+        if(intakeServo.getPosition() == 0)
+            OpenIntake();
+        else
+            CloseIntake();
+    }
+
     public void CloseIntake() {
         intakeServo.setPosition(0);
     }
