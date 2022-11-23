@@ -64,6 +64,7 @@ public class Auto extends LinearOpMode {
     private LiftController liftController;
 
     private VisionPathway visionPathway;
+    private VisionPathway.ParkingPosition parkingPosition;
 
     private void WaitMillis(int millis) {
         ElapsedTime timer = new ElapsedTime();
@@ -73,6 +74,7 @@ public class Auto extends LinearOpMode {
     }
 
     private static final double MOVE_SPEED = 0.5;
+    private static final int MOVE_WAIT_MILLIS = 500;
 
     @Override
     public void runOpMode() {
@@ -93,6 +95,7 @@ public class Auto extends LinearOpMode {
 
         while(!isStarted()) {
             visionPathway.UpdateDetections();
+            parkingPosition = visionPathway.parkingPosition;
             telemetry.addData("Parking Position", visionPathway.parkingPosition.name());
             telemetry.update();
         }
@@ -100,7 +103,10 @@ public class Auto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // Autonomous Code
+
+    }
+
+    private void RedAutonomous() {
         liftController.CloseIntake();
         WaitMillis(500);
 
@@ -108,31 +114,74 @@ public class Auto extends LinearOpMode {
         WaitMillis(1000);
 
         driver.StrafeByInches(-5, MOVE_SPEED / 2);
-        WaitMillis(1000);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
-        WaitMillis(1000);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         driver.DriveByInches(24, MOVE_SPEED);
-        WaitMillis(1000);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
         WaitMillis(3000);
 
         driver.StrafeByInches(17, MOVE_SPEED / 2.0);
-        WaitMillis(1000);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
         WaitMillis(500);
 
         driver.StrafeByInches(-13, MOVE_SPEED / 2.0);
-        WaitMillis(1000);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
         WaitMillis(1000);
 
-        driver.StrafeByInches(-30, MOVE_SPEED);
+        if(parkingPosition == VisionPathway.ParkingPosition.ONE)
+            driver.StrafeByInches(-30, MOVE_SPEED);
+        else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
+            driver.StrafeByInches(30, MOVE_SPEED);
 
         while(opModeIsActive() && liftController.IsLiftBusy()); // Wait for lift to finish
     }
+
+    private void BlueAutonomous() {
+        liftController.CloseIntake();
+        WaitMillis(500);
+
+        liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
+        WaitMillis(1000);
+
+        driver.StrafeByInches(-5, MOVE_SPEED / 2);
+        WaitMillis(MOVE_WAIT_MILLIS);
+
+        driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
+        WaitMillis(MOVE_WAIT_MILLIS);
+
+        driver.DriveByInches(24, MOVE_SPEED);
+        WaitMillis(MOVE_WAIT_MILLIS);
+
+        liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+        WaitMillis(3000);
+
+        driver.StrafeByInches(-17, MOVE_SPEED / 2.0);
+        WaitMillis(MOVE_WAIT_MILLIS);
+
+        liftController.OpenIntake();
+        WaitMillis(500);
+
+        driver.StrafeByInches(13, MOVE_SPEED / 2.0);
+        WaitMillis(MOVE_WAIT_MILLIS);
+
+        liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
+        WaitMillis(1000);
+
+        if(parkingPosition == VisionPathway.ParkingPosition.ONE)
+            driver.StrafeByInches(-30, MOVE_SPEED);
+        else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
+            driver.StrafeByInches(30, MOVE_SPEED);
+
+        while(opModeIsActive() && liftController.IsLiftBusy()); // Wait for lift to finish
+    }
+
 }
