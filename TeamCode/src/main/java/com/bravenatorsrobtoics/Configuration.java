@@ -20,8 +20,8 @@ public class Configuration extends LinearOpMode {
 
         menu.clearOptions();
 
-        menu.addOption(SINGLE_CONTROLLER_OVERRIDE, config.IsSingleControllerOverride());
         menu.addOption(STARTING_POSITION, Config.StartingPosition.class, config.GetStartingPosition());
+        menu.addOption(SINGLE_CONTROLLER_OVERRIDE, config.IsSingleControllerOverride());
 
         menu.setGamepad(gamepad1);
         menu.setTelemetry(telemetry);
