@@ -73,6 +73,8 @@ public class Teleop extends LinearOpMode {
 
     private boolean shouldUseMasterController = false;
 
+    private double offsetHeading = 0;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initializing");
@@ -105,9 +107,7 @@ public class Teleop extends LinearOpMode {
             HandleDrive();
 
             driverGamePad.update();
-
-            if(!shouldUseMasterController)
-                operatorGamePad.update();
+            operatorGamePad.update();
 
             // Update Controllers
             liftController.Update();
@@ -123,7 +123,7 @@ public class Teleop extends LinearOpMode {
         double rx = Range.clip(Math.pow(gamepad1.right_stick_x, 3), -1.0, 1.0);
 
         // Read inverse IMU heading, as the UMG heading is CW positive
-        double botHeading = -hardware.GetCurrentHeading();
+        double botHeading = -hardware.GetCurrentHeading() + offsetHeading;
 
         double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
         double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
@@ -149,6 +149,10 @@ public class Teleop extends LinearOpMode {
     private void OnDriverGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
         if(shouldUseMasterController)
             OnOperatorGamePadChange(gamePad, button, pressed);
+
+        if(button == FtcGamePad.GAMEPAD_BACK && pressed) {
+            offsetHeading = hardware.GetCurrentHeading();
+        }
     }
 
     private void OnOperatorGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
