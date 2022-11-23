@@ -29,6 +29,7 @@
 
 package com.bravenatorsrobtoics;
 
+import com.bravenatorsrobtoics.config.Config;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
@@ -59,6 +60,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name="Autonomous", group="Linear Opmode")
 public class Auto extends LinearOpMode {
 
+    private Config config;
+
     private MecanumDriveHardware hardware;
     private MecanumDriver driver;
     private LiftController liftController;
@@ -80,6 +83,8 @@ public class Auto extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initializing");
         telemetry.update();
+
+        config = new Config(hardwareMap.appContext);
 
         hardware = new MecanumDriveHardware(hardwareMap);
         hardware.SetBulkUpdateMode(LynxModule.BulkCachingMode.AUTO);
@@ -103,7 +108,11 @@ public class Auto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-
+        // Run the autonomous based on the config
+        if(config.GetStartingPosition() == Config.StartingPosition.RED)
+            RedAutonomous();
+        else
+            BlueAutonomous();
     }
 
     private void RedAutonomous() {

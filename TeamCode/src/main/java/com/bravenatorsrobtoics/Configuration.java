@@ -27,7 +27,7 @@ public class Configuration extends LinearOpMode {
         menu.setTelemetry(telemetry);
 
         waitForStart();
-        
+
         while(!isStopRequested()) {
             menu.displayMenu();
 
