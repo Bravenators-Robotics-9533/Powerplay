@@ -31,6 +31,14 @@ class Option
 
     }
 
+    // Boolean
+    public Option(String name, boolean initialValue)
+    {
+        this.name = name;
+        this.choices = new String[] { "True", "False" };
+        this.choiceIndex = initialValue ? 0 : 1;
+    }
+
     public Option(String name, double max, double min, double inc)
     {
         this.name = name;
@@ -133,6 +141,11 @@ public class SimpleMenu {
     public void addOption(String option, String[] choices)
     {
         this.options.add(new Option(option, choices));
+    }
+
+    public void addOption(String option, boolean initialValue)
+    {
+        this.options.add(new Option(option, initialValue));
     }
 
     public void addOption(String option, String[] choices, String initialChoice)
