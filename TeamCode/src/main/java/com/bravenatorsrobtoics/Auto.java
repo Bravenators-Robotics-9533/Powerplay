@@ -33,6 +33,7 @@ import com.bravenatorsrobtoics.config.Config;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
+import com.bravenatorsrobtoics.vision.AprilTagVisionPathway;
 import com.bravenatorsrobtoics.vision.VisionPathway;
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -93,15 +94,15 @@ public class Auto extends LinearOpMode {
         driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
-        visionPathway = new VisionPathway(this);
+        visionPathway = new AprilTagVisionPathway(hardwareMap);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         while(!isStarted()) {
             visionPathway.UpdateDetections();
-            parkingPosition = visionPathway.parkingPosition;
-            telemetry.addData("Parking Position", visionPathway.parkingPosition.name());
+            parkingPosition = visionPathway.GetDetectedParkingPosition();
+            telemetry.addData("Parking Position", visionPathway.GetDetectedParkingPosition().name());
             telemetry.update();
         }
 
