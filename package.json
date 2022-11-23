@@ -1,0 +1,25 @@
+{
+  "name": "powerplay",
+  "version": null,
+  "description": "This repository contains the public FTC SDK for the Freight Frenzy (2021-2022) competition season.",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "standard-version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bravenators-Robotics-9533/Powerplay.git"
+  },
+  "author": "Nick Fanelli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bravenators-Robotics-9533/Powerplay/issues"
+  },
+  "homepage": "https://github.com/Bravenators-Robotics-9533/Powerplay#readme",
+  "dependencies": {
+    "standard-version": "^9.1.0"
+  }
+}
