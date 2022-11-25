@@ -145,7 +145,6 @@ public class MecanumDriver {
 
         double deltaRadians = Math.toRadians(degrees);
         double originalHeading = hardware.GetCurrentHeading(); // Radians
-        double targetHeading = originalHeading + deltaRadians;
 
         while(opMode.opModeIsActive()) {
             float absProgress = (float) Math.abs(((hardware.GetCurrentHeading() - originalHeading) / deltaRadians));
@@ -160,24 +159,6 @@ public class MecanumDriver {
             hardware.SetMotorPower(hardware.backLeft, -easedPower * speedMultiplier);
             hardware.SetMotorPower(hardware.backRight, easedPower * speedMultiplier);
         }
-
-//        hardware.StopAllMotors();
-//
-//        // Correction
-//        double finalHeading = hardware.GetCurrentHeading();
-//        double error = Math.abs(targetHeading - finalHeading);
-//
-//        while(opMode.opModeIsActive()) {
-//            float absProgress = (float) Math.abs(((hardware.GetCurrentHeading() - finalHeading) / error));
-//
-//            if(absProgress >= 1.0)
-//                break;
-//
-//            hardware.SetMotorPower(hardware.frontLeft, 0.04);
-//            hardware.SetMotorPower(hardware.frontRight, -0.04);
-//            hardware.SetMotorPower(hardware.backLeft, 0.04);
-//            hardware.SetMotorPower(hardware.backRight, -0.04);
-//        }
 
         hardware.StopAllMotors();
     }
