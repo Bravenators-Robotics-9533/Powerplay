@@ -60,18 +60,17 @@ import com.qualcomm.robotcore.util.Range;
 public class Teleop extends LinearOpMode {
 
     private static final double MAX_ROBOT_SPEED = 0.5;
+    private static final double SLOW_MODE_SPEED = 0.1;
 
     private FtcGamePad driverGamePad;
     private FtcGamePad operatorGamePad;
 
     // Declare OpMode members.
     private MecanumDriveHardware hardware;
-    private MecanumDriver driver;
     private LiftController liftController;
 
-    private float initialHeading = 0;
-
     private boolean shouldUseMasterController = false;
+    private boolean isSlowModeEnabled = false;
 
     private double offsetHeading = 0;
 
@@ -87,13 +86,10 @@ public class Teleop extends LinearOpMode {
         hardware.SetBulkUpdateMode(LynxModule.BulkCachingMode.MANUAL);
         hardware.SetZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
         driverGamePad = new FtcGamePad("Driver GamePad", gamepad1, this::OnDriverGamePadChange);
         operatorGamePad = new FtcGamePad("Operator GamePad", gamepad2, this::OnOperatorGamePadChange);
-
-        initialHeading = (float) hardware.GetCurrentHeading();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -137,10 +133,10 @@ public class Teleop extends LinearOpMode {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        hardware.SetMotorPower(hardware.frontLeft, frontLeftPower / (1 / MAX_ROBOT_SPEED));
-        hardware.SetMotorPower(hardware.frontRight, frontRightPower / (1 / MAX_ROBOT_SPEED));
-        hardware.SetMotorPower(hardware.backLeft, backLeftPower / (1 / MAX_ROBOT_SPEED));
-        hardware.SetMotorPower(hardware.backRight, backRightPower / (1 / MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.frontLeft, frontLeftPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.frontRight, frontRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.backLeft, backLeftPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
+        hardware.SetMotorPower(hardware.backRight, backRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
 
         telemetry.addData("IMU", -hardware.GetCurrentHeading());
         telemetry.update();
@@ -150,9 +146,19 @@ public class Teleop extends LinearOpMode {
         if(shouldUseMasterController)
             OnOperatorGamePadChange(gamePad, button, pressed);
 
-        if(button == FtcGamePad.GAMEPAD_BACK && pressed) {
-            offsetHeading = hardware.GetCurrentHeading();
+        switch(button) {
+            case FtcGamePad.GAMEPAD_BACK:
+                if(pressed)
+                    offsetHeading = hardware.GetCurrentHeading();
+
+                break;
+            case FtcGamePad.GAMEPAD_RBUMPER:
+                if(pressed)
+                    isSlowModeEnabled = !isSlowModeEnabled;
+
+                break;
         }
+
     }
 
     private double prevRightTrigger = 0;
