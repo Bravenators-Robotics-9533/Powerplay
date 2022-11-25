@@ -94,7 +94,7 @@ public class Auto extends LinearOpMode {
         driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
-        visionPathway = new AprilTagVisionPathway(hardwareMap);
+        visionPathway = new AprilTagVisionPathway(this);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();

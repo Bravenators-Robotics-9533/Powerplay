@@ -52,10 +52,6 @@ public class TensorFlowVisionPathway extends VisionPathway {
      */
     private VuforiaLocalizer vuforia;
 
-    private final LinearOpMode opMode;
-    private final HardwareMap hardwareMap;
-    private final Telemetry telemetry;
-
     /**
      * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
      * Detection engine.
@@ -63,9 +59,7 @@ public class TensorFlowVisionPathway extends VisionPathway {
     private TFObjectDetector tfod;
 
     public TensorFlowVisionPathway(LinearOpMode opMode) {
-        this.opMode = opMode;
-        this.hardwareMap = opMode.hardwareMap;
-        this.telemetry = opMode.telemetry;
+        super(opMode);
 
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
