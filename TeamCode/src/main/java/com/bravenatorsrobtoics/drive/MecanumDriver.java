@@ -33,18 +33,10 @@ public class MecanumDriver {
         hardware.backLeft.setMode(runMode);
     }
 
-    private void AddToTargetPosition(DcMotorEx motor, int encoderTicks) {
-        motor.setTargetPosition(motor.getCurrentPosition() + encoderTicks);
-    }
-
     private boolean IsBusy() {
         return
                 hardware.frontLeft.isBusy() || hardware.backLeft.isBusy() ||
                 hardware.frontRight.isBusy() || hardware.backRight.isBusy();
-    }
-
-    private static double ScalePower(double value, double max) {
-        return max != 0 ? value / max : 0;
     }
 
     public void Drive(double v, double h, double r) {
@@ -73,7 +65,7 @@ public class MecanumDriver {
         hardware.SetMotorPower(hardware.backRight, rightRear);
     }
 
-    private static final float LOW_CLIP = 0.2f;
+    private static final float LOW_CLIP = 0.5f;
     private static final float HIGH_CLIP = 0.5f;
 
     private static final float SLOW_SPEED_MIN = 0.1f;
