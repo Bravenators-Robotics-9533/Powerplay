@@ -23,7 +23,7 @@ public class LiftController {
         MID(6895),
         HIGH(6895);
 
-        final int encoderValue;
+        public final int encoderValue;
 
         LiftStage(int encoderValue) {
             this.encoderValue = encoderValue;
@@ -63,6 +63,13 @@ public class LiftController {
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(1);
     }
+
+    public void SetRawLiftPower(double power) {
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setPower(power);
+    }
+
+    public int GetLiftCurrentPosition() { return this.liftMotor.getCurrentPosition(); }
 
     public boolean IsLiftBusy() { return this.liftMotor.isBusy(); }
 

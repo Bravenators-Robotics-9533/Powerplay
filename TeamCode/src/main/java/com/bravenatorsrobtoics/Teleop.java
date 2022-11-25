@@ -118,8 +118,8 @@ public class Teleop extends LinearOpMode {
     // Field Centric Driving
     private void HandleDrive() {
         double y = Range.clip(Math.pow(-gamepad1.left_stick_y, 3), -1.0, 1.0);
-        double x = Range.clip(Math.pow(gamepad1.left_stick_x, 3)
-                + Math.pow(gamepad1.right_trigger, 3) - Math.pow(gamepad1.left_trigger, 3), -1.0, 1.0) * 1.1;
+        double xt = (Math.pow(gamepad1.right_trigger, 3) - Math.pow(gamepad1.left_trigger, 3)) * (shouldUseMasterController ? 0 : 1);
+        double x = Range.clip(Math.pow(gamepad1.left_stick_x, 3) + xt, -1.0, 1.0) * 1.1;
         double rx = Range.clip(Math.pow(gamepad1.right_stick_x, 3), -1.0, 1.0);
 
         // Read inverse IMU heading, as the UMG heading is CW positive
@@ -155,6 +155,9 @@ public class Teleop extends LinearOpMode {
         }
     }
 
+    private double prevRightTrigger = 0;
+    private double prevLeftTrigger = 0;
+
     private void OnOperatorGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
         switch (button) {
 
@@ -188,8 +191,21 @@ public class Teleop extends LinearOpMode {
                 if(pressed)
                     liftController.GoToLiftStage(LiftController.LiftStage.MID);
                 break;
-
         }
+
+        if(gamePad.getRightTrigger() != prevRightTrigger || gamePad.getLeftTrigger() != prevLeftTrigger) {
+            double powerApplied = gamePad.getRightTrigger() - gamePad.getLeftTrigger();
+
+            if(powerApplied < 0 && liftController.GetLiftCurrentPosition() <= 0)
+                liftController.SetRawLiftPower(0);
+            else if(powerApplied > 0 && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.HIGH.encoderValue)
+                liftController.SetRawLiftPower(0);
+            else
+                liftController.SetRawLiftPower(powerApplied);
+        }
+
+        prevLeftTrigger = gamePad.getLeftTrigger();
+        prevRightTrigger = gamePad.getRightTrigger();
     }
 
 }
