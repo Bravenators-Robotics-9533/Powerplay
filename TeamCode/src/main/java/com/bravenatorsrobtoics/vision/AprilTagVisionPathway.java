@@ -49,7 +49,7 @@ public class AprilTagVisionPathway extends VisionPathway {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(1280,720, OpenCvCameraRotation.UPSIDE_DOWN);
+                camera.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
