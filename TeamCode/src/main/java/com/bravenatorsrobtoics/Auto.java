@@ -152,7 +152,7 @@ public class Auto extends LinearOpMode {
         else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
             driver.StrafeByInches(30, MOVE_SPEED);
 
-        while(opModeIsActive() && liftController.IsLiftBusy()); // Wait for lift to finish
+        while(opModeIsActive() && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.GROUND.encoderValue); // Wait for lift to finish
     }
 
     private void BlueAutonomous() {
@@ -191,7 +191,7 @@ public class Auto extends LinearOpMode {
         else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
             driver.StrafeByInches(30, MOVE_SPEED);
 
-        while(opModeIsActive() && liftController.IsLiftBusy()); // Wait for lift to finish
+        while(opModeIsActive() && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.GROUND.encoderValue); // Wait for lift to finish
     }
 
 }
