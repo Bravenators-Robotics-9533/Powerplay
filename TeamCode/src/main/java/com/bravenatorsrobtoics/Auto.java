@@ -118,10 +118,13 @@ public class Auto extends LinearOpMode {
 
     private void RedAutonomous() {
         liftController.CloseIntake();
-        WaitMillis(500);
+        WaitMillis(750);
 
         liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
         WaitMillis(1000);
+
+        driver.DriveByInches(3, MOVE_SPEED);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         driver.StrafeByInches(-5, MOVE_SPEED / 2);
         WaitMillis(MOVE_WAIT_MILLIS);
@@ -129,13 +132,13 @@ public class Auto extends LinearOpMode {
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
-        driver.DriveByInches(24, MOVE_SPEED);
+        driver.DriveByInches(23.75, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
-        WaitMillis(3000);
+        WaitMillis(4000);
 
-        driver.StrafeByInches(17, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(16, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
@@ -150,7 +153,9 @@ public class Auto extends LinearOpMode {
         if(parkingPosition == VisionPathway.ParkingPosition.ONE)
             driver.StrafeByInches(-30, MOVE_SPEED);
         else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
-            driver.StrafeByInches(30, MOVE_SPEED);
+            driver.StrafeByInches(27, MOVE_SPEED);
+        else
+            driver.DriveByInches(-3, MOVE_SPEED);
 
         while(opModeIsActive() && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.GROUND.encoderValue); // Wait for lift to finish
     }
@@ -168,13 +173,13 @@ public class Auto extends LinearOpMode {
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
-        driver.DriveByInches(24, MOVE_SPEED);
+        driver.DriveByInches(23.75, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
-        WaitMillis(3000);
+        WaitMillis(4000);
 
-        driver.StrafeByInches(-17, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(-16, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
@@ -189,7 +194,9 @@ public class Auto extends LinearOpMode {
         if(parkingPosition == VisionPathway.ParkingPosition.ONE)
             driver.StrafeByInches(-30, MOVE_SPEED);
         else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
-            driver.StrafeByInches(30, MOVE_SPEED);
+            driver.StrafeByInches(27, MOVE_SPEED);
+        else
+            driver.DriveByInches(-3, MOVE_SPEED);
 
         while(opModeIsActive() && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.GROUND.encoderValue); // Wait for lift to finish
     }

@@ -20,8 +20,8 @@ public class LiftController {
         GROUND(0),
         SLIGHTLY_RAISED(500),
         LOW(4265),
-        MID(6895),
-        HIGH(6895);
+        MID(7000),
+        HIGH(7000);
 
         public final int encoderValue;
 
