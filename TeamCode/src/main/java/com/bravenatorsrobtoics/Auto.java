@@ -138,13 +138,13 @@ public class Auto extends LinearOpMode {
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
         WaitMillis(4000);
 
-        driver.StrafeByInches(16, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(15.25, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
         WaitMillis(500);
 
-        driver.StrafeByInches(-13, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(-12.25, MOVE_SPEED / 2.0); // less
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
@@ -162,10 +162,13 @@ public class Auto extends LinearOpMode {
 
     private void BlueAutonomous() {
         liftController.CloseIntake();
-        WaitMillis(500);
+        WaitMillis(750);
 
         liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
         WaitMillis(1000);
+
+        driver.DriveByInches(3, MOVE_SPEED);
+        WaitMillis(MOVE_WAIT_MILLIS);
 
         driver.StrafeByInches(-5, MOVE_SPEED / 2);
         WaitMillis(MOVE_WAIT_MILLIS);
@@ -179,13 +182,13 @@ public class Auto extends LinearOpMode {
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
         WaitMillis(4000);
 
-        driver.StrafeByInches(-16, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(-15.25, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
         WaitMillis(500);
 
-        driver.StrafeByInches(13, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(12.25, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
