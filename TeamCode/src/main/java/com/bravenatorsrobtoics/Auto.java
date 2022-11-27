@@ -132,7 +132,7 @@ public class Auto extends LinearOpMode {
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
-        driver.DriveByInches(23.75, MOVE_SPEED);
+        driver.DriveByInches(23.25, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
@@ -176,7 +176,7 @@ public class Auto extends LinearOpMode {
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
-        driver.DriveByInches(23.75, MOVE_SPEED);
+        driver.DriveByInches(23.25, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
