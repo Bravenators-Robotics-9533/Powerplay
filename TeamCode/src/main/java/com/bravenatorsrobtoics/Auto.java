@@ -35,12 +35,9 @@ import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
 import com.bravenatorsrobtoics.vision.AprilTagVisionPathway;
 import com.bravenatorsrobtoics.vision.VisionPathway;
-import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -80,12 +77,23 @@ public class Auto extends LinearOpMode {
     private static final double MOVE_SPEED = 0.5;
     private static final int MOVE_WAIT_MILLIS = 500;
 
+    private double redDistanceOffWall;
+    private double redStrafeDistanceToPole;
+
+    private double blueDistanceOffWall;
+    private double blueStrafeDistanceToPole;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initializing");
         telemetry.update();
 
         config = new Config(hardwareMap.appContext);
+        this.redStrafeDistanceToPole = config.GetRedStrafeDistanceToPole();
+        this.redDistanceOffWall = config.GetRedDistanceOffWall();
+
+        this.blueStrafeDistanceToPole = config.GetBlueStrafeDistanceToPole();
+        this.blueDistanceOffWall = config.GetBlueDistanceOffWall();
 
         hardware = new MecanumDriveHardware(hardwareMap);
         hardware.SetBulkUpdateMode(LynxModule.BulkCachingMode.AUTO);
@@ -132,13 +140,13 @@ public class Auto extends LinearOpMode {
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
-        driver.DriveByInches(23.25, MOVE_SPEED);
+        driver.DriveByInches(redDistanceOffWall, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
         WaitMillis(4000);
 
-        driver.StrafeByInches(15.25, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(redStrafeDistanceToPole, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
@@ -176,13 +184,13 @@ public class Auto extends LinearOpMode {
         driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
-        driver.DriveByInches(23.25, MOVE_SPEED);
+        driver.DriveByInches(blueDistanceOffWall, MOVE_SPEED);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
         WaitMillis(4000);
 
-        driver.StrafeByInches(-15.25, MOVE_SPEED / 2.0);
+        driver.StrafeByInches(-blueStrafeDistanceToPole, MOVE_SPEED / 2.0);
         WaitMillis(MOVE_WAIT_MILLIS);
 
         liftController.OpenIntake();
