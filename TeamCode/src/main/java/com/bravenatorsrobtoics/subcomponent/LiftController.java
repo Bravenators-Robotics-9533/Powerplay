@@ -16,12 +16,17 @@ public class LiftController {
 
     private final Servo intakeServo;
 
+    public void ResetLiftEncoder() {
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
     public enum LiftStage {
         GROUND(0),
-        SLIGHTLY_RAISED(500),
-        LOW(4265),
-        MID(7000),
-        HIGH(7000);
+        SLIGHTLY_RAISED((int) (500 * .33)),
+        LOW ((int) (4300 * .33)),
+        MID ((int) (7150 * .33)),
+        HIGH((int) (7400 * .33));
 
         public final int encoderValue;
 
@@ -34,7 +39,6 @@ public class LiftController {
         this.opMode = opMode;
 
         liftMotor = opMode.hardwareMap.get(DcMotorEx.class, "lift");
-        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

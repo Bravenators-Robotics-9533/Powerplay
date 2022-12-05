@@ -101,6 +101,7 @@ public class Teleop extends LinearOpMode {
             hardware.ClearBulkCache();
 
             HandleDrive();
+            HandleOperatorLift();
 
             driverGamePad.update();
             operatorGamePad.update();
@@ -109,6 +110,17 @@ public class Teleop extends LinearOpMode {
             liftController.Update();
         }
 
+    }
+
+    private double prevLiftMotorPower = 0;
+
+    private void HandleOperatorLift() {
+        double liftMotorPower = Math.pow(gamepad2.right_trigger, 3) - Math.pow(gamepad2.left_trigger, 3);
+
+        if(prevLiftMotorPower != liftMotorPower)
+            liftController.SetRawLiftPower(liftMotorPower);
+
+        prevLiftMotorPower = liftMotorPower;
     }
 
     // Field Centric Driving
@@ -162,12 +174,8 @@ public class Teleop extends LinearOpMode {
 
     }
 
-    private double prevRightTrigger = 0;
-    private double prevLeftTrigger = 0;
-
     private void OnOperatorGamePadChange(FtcGamePad gamePad, int button, boolean pressed) {
         switch (button) {
-
             case FtcGamePad.GAMEPAD_A:
                 if(pressed) {
                     liftController.ToggleIntake();
@@ -198,21 +206,13 @@ public class Teleop extends LinearOpMode {
                 if(pressed)
                     liftController.GoToLiftStage(LiftController.LiftStage.MID);
                 break;
+
+            case FtcGamePad.GAMEPAD_BACK:
+                if(pressed)
+                    liftController.ResetLiftEncoder();
+
+                break;
         }
-
-        if(gamePad.getRightTrigger() != prevRightTrigger || gamePad.getLeftTrigger() != prevLeftTrigger) {
-            double powerApplied = gamePad.getRightTrigger() - gamePad.getLeftTrigger();
-
-            if(powerApplied < 0 && liftController.GetLiftCurrentPosition() <= 0)
-                liftController.SetRawLiftPower(0);
-            else if(powerApplied > 0 && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.HIGH.encoderValue)
-                liftController.SetRawLiftPower(0);
-            else
-                liftController.SetRawLiftPower(powerApplied);
-        }
-
-        prevLeftTrigger = gamePad.getLeftTrigger();
-        prevRightTrigger = gamePad.getRightTrigger();
     }
 
 }
