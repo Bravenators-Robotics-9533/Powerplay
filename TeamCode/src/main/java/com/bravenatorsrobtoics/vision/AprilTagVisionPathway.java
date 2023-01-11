@@ -1,7 +1,6 @@
 package com.bravenatorsrobtoics.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.apriltag.AprilTagDetection;
@@ -28,7 +27,7 @@ public class AprilTagVisionPathway extends VisionPathway {
     protected double cy = 221.506;
 
     // UNITS ARE METERS
-    protected double tagsize = 0.166;
+    protected double tagSize = 0.166;
 
     protected int numFramesWithoutDetection = 0;
 
@@ -43,7 +42,7 @@ public class AprilTagVisionPathway extends VisionPathway {
         super(linearOpMode);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagSize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {

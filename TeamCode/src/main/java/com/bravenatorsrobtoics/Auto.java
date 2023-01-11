@@ -58,13 +58,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name="Autonomous", group="Linear Opmode")
 public class Auto extends LinearOpMode {
 
-    private Config config;
-
-    private MecanumDriveHardware hardware;
     private MecanumDriver driver;
     private LiftController liftController;
 
-    private VisionPathway visionPathway;
     private VisionPathway.ParkingPosition parkingPosition;
 
     private void WaitMillis(int millis) {
@@ -88,21 +84,21 @@ public class Auto extends LinearOpMode {
         telemetry.addData("Status", "Initializing");
         telemetry.update();
 
-        config = new Config(hardwareMap.appContext);
+        Config config = new Config(hardwareMap.appContext);
         this.redStrafeDistanceToPole = config.GetRedStrafeDistanceToPole();
         this.redDistanceOffWall = config.GetRedDistanceOffWall();
 
         this.blueStrafeDistanceToPole = config.GetBlueStrafeDistanceToPole();
         this.blueDistanceOffWall = config.GetBlueDistanceOffWall();
 
-        hardware = new MecanumDriveHardware(hardwareMap);
+        MecanumDriveHardware hardware = new MecanumDriveHardware(hardwareMap);
         hardware.SetBulkUpdateMode(LynxModule.BulkCachingMode.AUTO);
         hardware.SetZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         driver = new MecanumDriver(this, hardware);
         liftController = new LiftController(this);
 
-        visionPathway = new AprilTagVisionPathway(this);
+        VisionPathway visionPathway = new AprilTagVisionPathway(this);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();

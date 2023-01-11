@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 class AprilTagDetectionPipeline extends OpenCvPipeline {
 
-    private long nativeApriltagPtr;
+    private long nativeAprilTagPtr;
     private final Mat grey = new Mat();
     private ArrayList<AprilTagDetection> detections = new ArrayList<>();
 
@@ -38,18 +38,18 @@ class AprilTagDetectionPipeline extends OpenCvPipeline {
     private final double cy;
 
     // UNITS ARE METERS
-    private final double tagsize;
-    private final double tagsizeX;
-    private final double tagsizeY;
+    private final double tagSize;
+    private final double tagSizeX;
+    private final double tagSizeY;
 
     private float decimation;
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
-    public AprilTagDetectionPipeline(double tagsize, double fx, double fy, double cx, double cy) {
-        this.tagsize = tagsize;
-        this.tagsizeX = tagsize;
-        this.tagsizeY = tagsize;
+    public AprilTagDetectionPipeline(double tagSize, double fx, double fy, double cx, double cy) {
+        this.tagSize = tagSize;
+        this.tagSizeX = tagSize;
+        this.tagSizeY = tagSize;
         this.fx = fx;
         this.fy = fy;
         this.cx = cx;
@@ -58,16 +58,16 @@ class AprilTagDetectionPipeline extends OpenCvPipeline {
         constructMatrix();
 
         // Allocate a native context object. See the corresponding deletion in the finalizer
-        nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
+        nativeAprilTagPtr = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
     }
 
     @Override
     protected void finalize() {
         // Might be null if createApriltagDetector() threw an exception
-        if(nativeApriltagPtr != 0) {
+        if(nativeAprilTagPtr != 0) {
             // Delete the native context we created in the constructor
-            AprilTagDetectorJNI.releaseApriltagDetector(nativeApriltagPtr);
-            nativeApriltagPtr = 0;
+            AprilTagDetectorJNI.releaseApriltagDetector(nativeAprilTagPtr);
+            nativeAprilTagPtr = 0;
         } else {
             System.out.println("AprilTagDetectionPipeline.finalize(): nativeApriltagPtr was NULL");
         }
@@ -80,13 +80,13 @@ class AprilTagDetectionPipeline extends OpenCvPipeline {
 
         synchronized (decimationSync) {
             if(needToSetDecimation) {
-                AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, decimation);
+                AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeAprilTagPtr, decimation);
                 needToSetDecimation = false;
             }
         }
 
         // Run AprilTag
-        detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
+        detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeAprilTagPtr, grey, tagSize, fx, fy, cx, cy);
 
         synchronized (detectionsUpdateSync) {
             detectionsUpdate = detections;
@@ -95,9 +95,9 @@ class AprilTagDetectionPipeline extends OpenCvPipeline {
         // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
         for(AprilTagDetection detection : detections) {
-            Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
-            drawAxisMarker(input, tagsizeY/2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
-            draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
+            Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagSizeX, tagSizeY);
+            drawAxisMarker(input, tagSizeY /2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
+            draw3dCubeMarker(input, tagSizeX, tagSizeX, tagSizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
         return input;
