@@ -151,7 +151,8 @@ public class Teleop extends LinearOpMode {
         hardware.SetMotorPower(hardware.backLeft, backLeftPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
         hardware.SetMotorPower(hardware.backRight, backRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
 
-        telemetry.addData("IMU", -hardware.GetCurrentHeading());
+
+        telemetry.addData("Lift Position", liftController.GetLiftCurrentPosition());
         telemetry.update();
     }
 
@@ -201,10 +202,16 @@ public class Teleop extends LinearOpMode {
                     liftController.GoToLiftStage(LiftController.LiftStage.LOW);
                 break;
 
-            // Lift Stage High
+            // Lift Stage Mid
             case FtcGamePad.GAMEPAD_DPAD_RIGHT:
                 if(pressed)
                     liftController.GoToLiftStage(LiftController.LiftStage.MID);
+                break;
+
+            // Lift Stage Mid
+            case FtcGamePad.GAMEPAD_RBUMPER:
+                if(pressed)
+                    liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
                 break;
 
             case FtcGamePad.GAMEPAD_BACK:
