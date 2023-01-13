@@ -29,6 +29,9 @@
 
 package com.bravenatorsrobtoics;
 
+import com.bravenatorsrobtoics.autonomous.AbstractAutonomousPath;
+import com.bravenatorsrobtoics.autonomous.BlueAutonomousPath;
+import com.bravenatorsrobtoics.autonomous.RedAutonomousPath;
 import com.bravenatorsrobtoics.config.Config;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
 import com.bravenatorsrobtoics.drive.MecanumDriver;
@@ -79,6 +82,8 @@ public class Auto extends LinearOpMode {
     private double blueDistanceOffWall;
     private double blueStrafeDistanceToPole;
 
+    private AbstractAutonomousPath autonomousPath = null;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initializing");
@@ -110,102 +115,15 @@ public class Auto extends LinearOpMode {
             telemetry.update();
         }
 
+        if(config.GetStartingPosition() == Config.StartingPosition.RED)
+            autonomousPath = new RedAutonomousPath();
+        else
+            autonomousPath = new BlueAutonomousPath();
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // Run the autonomous based on the config
-        if(config.GetStartingPosition() == Config.StartingPosition.RED)
-            RedAutonomous();
-        else
-            BlueAutonomous();
+        // Run the selected autonomous path
+        autonomousPath.Run();
     }
-
-    private void RedAutonomous() {
-        liftController.CloseIntake();
-        WaitMillis(750);
-
-        liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
-        WaitMillis(1000);
-
-        driver.DriveByInches(3, MOVE_SPEED);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        driver.StrafeByInches(-5, MOVE_SPEED / 2);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        driver.DriveByInches(redDistanceOffWall, MOVE_SPEED);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
-        WaitMillis(4000);
-
-        driver.StrafeByInches(redStrafeDistanceToPole, MOVE_SPEED / 2.0);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        liftController.OpenIntake();
-        WaitMillis(500);
-
-        driver.StrafeByInches(-12.25, MOVE_SPEED / 2.0); // less
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
-        WaitMillis(1000);
-
-        if(parkingPosition == VisionPathway.ParkingPosition.ONE)
-            driver.StrafeByInches(-30, MOVE_SPEED);
-        else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
-            driver.StrafeByInches(27, MOVE_SPEED);
-        else
-            driver.DriveByInches(-3, MOVE_SPEED);
-
-        while(opModeIsActive() && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.GROUND.encoderValue); // Wait for lift to finish
-    }
-
-    private void BlueAutonomous() {
-        liftController.CloseIntake();
-        WaitMillis(750);
-
-        liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
-        WaitMillis(1000);
-
-        driver.DriveByInches(3, MOVE_SPEED);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        driver.StrafeByInches(-5, MOVE_SPEED / 2);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        driver.TurnDegrees(MecanumDriver.TurnDirection.COUNTER_CLOCKWISE, 90, MOVE_SPEED);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        driver.DriveByInches(blueDistanceOffWall, MOVE_SPEED);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
-        WaitMillis(4000);
-
-        driver.StrafeByInches(-blueStrafeDistanceToPole, MOVE_SPEED / 2.0);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        liftController.OpenIntake();
-        WaitMillis(500);
-
-        driver.StrafeByInches(12.25, MOVE_SPEED / 2.0);
-        WaitMillis(MOVE_WAIT_MILLIS);
-
-        liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
-        WaitMillis(1000);
-
-        if(parkingPosition == VisionPathway.ParkingPosition.ONE)
-            driver.StrafeByInches(-30, MOVE_SPEED);
-        else if(parkingPosition == VisionPathway.ParkingPosition.THREE)
-            driver.StrafeByInches(27, MOVE_SPEED);
-        else
-            driver.DriveByInches(-3, MOVE_SPEED);
-
-        while(opModeIsActive() && liftController.GetLiftCurrentPosition() >= LiftController.LiftStage.GROUND.encoderValue); // Wait for lift to finish
-    }
-
 }
