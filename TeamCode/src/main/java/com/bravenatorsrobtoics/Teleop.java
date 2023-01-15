@@ -29,12 +29,9 @@
 
 package com.bravenatorsrobtoics;
 
-import android.widget.MultiAutoCompleteTextView;
-
 import com.bravenatorsrobtoics.common.FtcGamePad;
 import com.bravenatorsrobtoics.config.Config;
 import com.bravenatorsrobtoics.drive.MecanumDriveHardware;
-import com.bravenatorsrobtoics.drive.MecanumDriver;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -107,7 +104,7 @@ public class Teleop extends LinearOpMode {
             operatorGamePad.update();
 
             // Update Controllers
-            liftController.Update();
+            liftController.RunSafetyChecks();
         }
 
     }
@@ -129,7 +126,7 @@ public class Teleop extends LinearOpMode {
         double y = Range.clip(Math.pow(-gamepad1.left_stick_y, 3), -1.0, 1.0);
         double xt = (Math.pow(gamepad1.right_trigger, 3) - Math.pow(gamepad1.left_trigger, 3)) * (shouldUseMasterController ? 0 : 1);
         double x = Range.clip(Math.pow(gamepad1.left_stick_x, 3) + xt, -1.0, 1.0) * 1.1;
-        double rx = Range.clip(Math.pow(gamepad1.right_stick_x, 3), -1.0, 1.0);
+        double rx = -Range.clip(Math.pow(gamepad1.right_stick_x, 3), -1.0, 1.0);
 
         // Read inverse IMU heading, as the UMG heading is CW positive
         double botHeading = -hardware.GetCurrentHeading() + offsetHeading;
@@ -151,8 +148,7 @@ public class Teleop extends LinearOpMode {
         hardware.SetMotorPower(hardware.backLeft, backLeftPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
         hardware.SetMotorPower(hardware.backRight, backRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
 
-
-        telemetry.addData("Lift Position", liftController.GetLiftCurrentPosition());
+        telemetry.addData("Lift Right Position", liftController.liftMotor.getCurrentPosition());
         telemetry.update();
     }
 

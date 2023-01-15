@@ -138,7 +138,7 @@ public class MecanumDriver {
     private static final double TURN_TOLERANCE = 0.975;
 
     public void TurnDegrees(TurnDirection turnDirection, int degrees, double power) {
-        int speedMultiplier = (turnDirection == TurnDirection.CLOCKWISE ? -1 : 1);
+        int speedMultiplier = (turnDirection == TurnDirection.CLOCKWISE ? 1 : -1);
 
         if(turnDirection == TurnDirection.CLOCKWISE)
             degrees *= -1;
