@@ -140,6 +140,8 @@ public class MecanumDriver {
     public void TurnDegrees(TurnDirection turnDirection, int degrees, double power) {
         int speedMultiplier = (turnDirection == TurnDirection.CLOCKWISE ? 1 : -1);
 
+        degrees -= 5;
+
         if(turnDirection == TurnDirection.CLOCKWISE)
             degrees *= -1;
 

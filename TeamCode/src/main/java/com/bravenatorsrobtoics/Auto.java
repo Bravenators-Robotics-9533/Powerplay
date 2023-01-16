@@ -174,7 +174,9 @@ public class Auto extends LinearOpMode {
         else
             driver.DriveByInches(-3, MOVE_SPEED);
 
-        while(opModeIsActive());
+        while(opModeIsActive() && liftController.liftMotor.isBusy());
+
+        liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
     }
 
     private void BlueAutonomousPath() {
@@ -220,7 +222,10 @@ public class Auto extends LinearOpMode {
         else
             driver.DriveByInches(-3, MOVE_SPEED);
 
-        while(opModeIsActive());
+        while(opModeIsActive() && liftController.liftMotor.isBusy());
+
+        liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
+
     }
 
 }

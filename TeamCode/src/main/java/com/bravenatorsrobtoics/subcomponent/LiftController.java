@@ -28,7 +28,7 @@ public class LiftController {
         SLIGHTLY_RAISED(210),
         LOW (575),
         MID (955),
-        HIGH(1285);
+        HIGH(1375);
 
         public final int encoderValue;
 
@@ -77,7 +77,7 @@ public class LiftController {
         liftMotor.setTargetPositionTolerance(25);
 
         if(liftMotor.getCurrentPosition() > liftStage.encoderValue) {
-            liftMotor.setVelocity(MAX_MOTOR_VELOCITY / 2.5);
+            liftMotor.setVelocity(MAX_MOTOR_VELOCITY / 4);
         } else {
             liftMotor.setVelocity(MAX_MOTOR_VELOCITY);
         }
