@@ -4,6 +4,8 @@
 *.ap_
 *.aab
 
+.DS_Store
+
 !libs/*.aar
 
 # Files for the ART/Dalvik VM
