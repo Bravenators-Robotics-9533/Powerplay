@@ -62,6 +62,9 @@ public class MecanumDriveHardware {
         backLeft.setTargetPositionTolerance(TARGET_POSITION_TOLERANCE);
         backRight.setTargetPositionTolerance(TARGET_POSITION_TOLERANCE);
 
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode                     = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit                = BNO055IMU.AngleUnit.RADIANS;
