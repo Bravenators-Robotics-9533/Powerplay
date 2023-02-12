@@ -2,14 +2,14 @@ package com.bravenatorsrobtoics.autonomous;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import roadrunner.drive.SampleMecanumDrive;
+import roadrunner.drive.RoadrunnerMecanumDrive;
 
 public abstract class AbstractAutonomousPath {
 
-    protected final SampleMecanumDrive drive;
+    protected final RoadrunnerMecanumDrive drive;
 
     public AbstractAutonomousPath(HardwareMap hardwareMap) {
-        drive = new SampleMecanumDrive(hardwareMap);
+        drive = new RoadrunnerMecanumDrive(hardwareMap);
     }
 
     public abstract void Run();
