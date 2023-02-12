@@ -15,7 +15,7 @@ public class RedAutonomousPath extends AbstractAutonomousPath {
         // Trajectory Definitions
 
         lineupInitialConeTrajectory = drive.trajectoryBuilder(new Pose2d())
-                .forward(54)
+                .forward(48)
                 .strafeRight(12)
                 .build();
     }
