@@ -25,26 +25,6 @@ public class Config {
         }
     }
 
-    private static final String RED_DISTANCE_OFF_WALL = "RedDistanceOffWall";
-    private float redDistanceOffWall = 23.25f;
-    public float GetRedDistanceOffWall() { return redDistanceOffWall; }
-    public void SetRedDistanceOffWall(float v) { this.redDistanceOffWall = v; }
-
-    private static final String RED_STRAFE_DISTANCE_TO_POLE = "RedStrafeDistanceToPole";
-    private float redStrafeDistanceToPole = 15.25f;
-    public float GetRedStrafeDistanceToPole() { return this.redStrafeDistanceToPole; }
-    public void SetRedStrafeDistanceToPole(float v) { this.redStrafeDistanceToPole = v; }
-
-    private static final String BLUE_DISTANCE_OFF_WALL = "BlueDistanceOffWall";
-    private float blueDistanceOffWall = 23.25f;
-    public float GetBlueDistanceOffWall() { return blueDistanceOffWall; }
-    public void SetBlueDistanceOffWall(float v) { this.blueDistanceOffWall = v; }
-
-    private static final String BLUE_STRAFE_DISTANCE_TO_POLE = "BlueStrafeDistanceToPole";
-    private float blueStrafeDistanceToPole = 15.25f;
-    public float GetBlueStrafeDistanceToPole() { return this.blueStrafeDistanceToPole; }
-    public void SetBlueStrafeDistanceToPole(float v) { this.blueStrafeDistanceToPole = v; }
-
     public Config(Context context) {
         sp = context.getSharedPreferences(PREFERENCES_ID, Context.MODE_PRIVATE);
         Load();
@@ -53,12 +33,6 @@ public class Config {
     public void Load() {
         singleControllerOverride = sp.getBoolean(SINGLE_CONTROLLER_OVERRIDE, false);
         startingPosition = StartingPosition.toStartingPosition(sp.getString(STARTING_POSITION, StartingPosition.RED.name()));
-
-        redDistanceOffWall = sp.getFloat(RED_DISTANCE_OFF_WALL, 23.25f);
-        redStrafeDistanceToPole = sp.getFloat(RED_STRAFE_DISTANCE_TO_POLE, 15.25f);
-
-        blueDistanceOffWall = sp.getFloat(BLUE_DISTANCE_OFF_WALL, 23.25f);
-        blueStrafeDistanceToPole = sp.getFloat(BLUE_STRAFE_DISTANCE_TO_POLE, 15.25f);
     }
 
     public void Save() {
@@ -66,10 +40,6 @@ public class Config {
 
         editor.putBoolean(SINGLE_CONTROLLER_OVERRIDE, singleControllerOverride);
         editor.putString(STARTING_POSITION, startingPosition.name());
-        editor.putFloat(RED_DISTANCE_OFF_WALL, redDistanceOffWall);
-        editor.putFloat(RED_STRAFE_DISTANCE_TO_POLE, redStrafeDistanceToPole);
-        editor.putFloat(BLUE_DISTANCE_OFF_WALL, blueDistanceOffWall);
-        editor.putFloat(BLUE_STRAFE_DISTANCE_TO_POLE, blueStrafeDistanceToPole);
 
         editor.apply();
     }
