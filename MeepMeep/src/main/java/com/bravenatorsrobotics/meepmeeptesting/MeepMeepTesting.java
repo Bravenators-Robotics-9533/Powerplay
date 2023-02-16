@@ -9,7 +9,7 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
     
-    private static final double DROP_SECONDS = 0.75;
+    private static final double DROP_SECONDS = 0;
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -24,32 +24,32 @@ public class MeepMeepTesting {
 
                             // Cycle
                             .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
                             .waitSeconds(DROP_SECONDS)
                             .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
 
                             .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
                             .waitSeconds(DROP_SECONDS)
                             .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
 
                             .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
                             .waitSeconds(DROP_SECONDS)
                             .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
 
                             .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
                             .waitSeconds(DROP_SECONDS)
                             .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
 
                             .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
                             .waitSeconds(DROP_SECONDS)
+                            .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
 
-                            .lineToLinearHeading(new Pose2d(-36, -12, Math.toRadians(90)))
-
-                            .lineToConstantHeading(new Vector2d(-36, -34))
+                            .waitSeconds(DROP_SECONDS)
+                            .splineToConstantHeading(new Vector2d(-36, -34), Math.toRadians(30))
 
                             .build()
                 );

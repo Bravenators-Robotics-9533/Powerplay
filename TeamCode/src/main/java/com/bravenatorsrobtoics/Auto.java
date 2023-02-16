@@ -101,7 +101,7 @@ public class Auto extends LinearOpMode {
         telemetry.update();
 
         autonomousPath = config.GetStartingPosition() == Config.StartingPosition.RED
-                ? new RedAutonomousPath(hardwareMap) : new BlueAutonomousPath(hardwareMap);
+                ? new RedAutonomousPath(this, hardwareMap) : new BlueAutonomousPath(this, hardwareMap);
 
         while(!isStarted()) {
             visionPathway.UpdateDetections();

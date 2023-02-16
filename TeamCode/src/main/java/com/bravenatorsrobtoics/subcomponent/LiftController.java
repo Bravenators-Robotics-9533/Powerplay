@@ -28,7 +28,7 @@ public class LiftController {
         SLIGHTLY_RAISED(210),
         LOW (575),
         MID (955),
-        HIGH(1375);
+        HIGH(1500);
 
         public final int encoderValue;
 
@@ -48,7 +48,7 @@ public class LiftController {
 
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        liftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
@@ -67,6 +67,21 @@ public class LiftController {
 
     public void CloseIntake() {
         intakeServo.setPosition(INTAKE_TARGET_CLOSED_POSITION);
+    }
+
+    public void GoToLiftPosition(int position) {
+        liftMotor.setTargetPosition(position);
+
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        liftMotor.setTargetPositionTolerance(25);
+
+        if(liftMotor.getCurrentPosition() > position) {
+            liftMotor.setVelocity(MAX_MOTOR_VELOCITY / 4);
+        } else {
+            liftMotor.setVelocity(MAX_MOTOR_VELOCITY);
+        }
+
     }
 
     public void GoToLiftStage(LiftStage liftStage) {
