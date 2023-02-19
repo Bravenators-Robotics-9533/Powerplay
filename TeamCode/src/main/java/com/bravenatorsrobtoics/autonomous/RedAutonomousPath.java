@@ -3,17 +3,9 @@ package com.bravenatorsrobtoics.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
-import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import roadrunner.drive.DriveConstants;
 
 public class RedAutonomousPath extends AbstractAutonomousPath {
 
@@ -72,7 +64,7 @@ public class RedAutonomousPath extends AbstractAutonomousPath {
         WaitMillis(500);
 
         // Synchronized Lift to Cruise Position
-        liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+        liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
 
         WaitMillis(250);
 
@@ -91,12 +83,12 @@ public class RedAutonomousPath extends AbstractAutonomousPath {
         drive.followTrajectory(pushConeForwardTrajectoryP1);
         drive.followTrajectory(pushConeForwardTrajectoryP2);
 
-        liftController.GoToLiftPosition(440);
+        liftController.AsyncGoToLiftPosition(440);
 
         drive.followTrajectory(driveToConeStackTrajectory);
 
         // Hit the cone stack
-        liftController.GoToLiftPosition(150);
+        liftController.AsyncGoToLiftPosition(150);
 
         WaitMillis(1000);
 
@@ -105,7 +97,7 @@ public class RedAutonomousPath extends AbstractAutonomousPath {
 
         WaitMillis(250);
 
-        liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+        liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
 
         WaitMillis(1000);
 

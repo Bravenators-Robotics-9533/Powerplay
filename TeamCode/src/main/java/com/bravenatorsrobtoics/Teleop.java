@@ -149,7 +149,8 @@ public class Teleop extends LinearOpMode {
         hardware.SetMotorPower(hardware.backLeft, backLeftPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
         hardware.SetMotorPower(hardware.backRight, backRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
 
-        telemetry.addData("Lift Right Position", liftController.liftMotor.getCurrentPosition());
+        telemetry.addData("Lift Right Position", liftController.liftMotorRight.getCurrentPosition());
+        telemetry.addData("Lift Left Position", liftController.liftMotorLeft.getCurrentPosition());
         telemetry.update();
     }
 
@@ -184,31 +185,31 @@ public class Teleop extends LinearOpMode {
             // Lift Stage Down
             case FtcGamePad.GAMEPAD_DPAD_DOWN:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.GROUND);
+                    liftController.AsyncGoToLiftStage(LiftController.LiftStage.GROUND);
                 break;
 
             // Lift Stage Low
             case FtcGamePad.GAMEPAD_DPAD_LEFT:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
+                    liftController.AsyncGoToLiftStage(LiftController.LiftStage.SLIGHTLY_RAISED);
                 break;
 
             // Lift Stage Mid
             case FtcGamePad.GAMEPAD_DPAD_UP:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.LOW);
+                    liftController.AsyncGoToLiftStage(LiftController.LiftStage.LOW);
                 break;
 
             // Lift Stage Mid
             case FtcGamePad.GAMEPAD_DPAD_RIGHT:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.MID);
+                    liftController.AsyncGoToLiftStage(LiftController.LiftStage.MID);
                 break;
 
             // Lift Stage Mid
             case FtcGamePad.GAMEPAD_RBUMPER:
                 if(pressed)
-                    liftController.GoToLiftStage(LiftController.LiftStage.HIGH);
+                    liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
                 break;
 
             case FtcGamePad.GAMEPAD_BACK:
