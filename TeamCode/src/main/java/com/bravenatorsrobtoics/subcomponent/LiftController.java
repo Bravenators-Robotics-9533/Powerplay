@@ -60,7 +60,7 @@ public class LiftController {
         liftMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         liftMotorRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        liftMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftMotorLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
