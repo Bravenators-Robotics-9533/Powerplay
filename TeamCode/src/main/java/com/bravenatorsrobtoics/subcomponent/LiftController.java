@@ -1,10 +1,12 @@
 package com.bravenatorsrobtoics.subcomponent;
 
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class LiftController {
 
@@ -17,6 +19,8 @@ public class LiftController {
     public final DcMotorEx liftMotor;
 
     private final Servo intakeServo;
+
+    private final TouchSensor magneticBottomSensor;
 
     public void ResetLiftEncoder() {
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -52,6 +56,8 @@ public class LiftController {
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
+
+        magneticBottomSensor = opMode.hardwareMap.get(TouchSensor.class, "lift-sensor");
     }
 
     public void OpenIntake() {
@@ -82,6 +88,33 @@ public class LiftController {
             liftMotor.setVelocity(MAX_MOTOR_VELOCITY);
         }
 
+    }
+
+    private static final double MOTOR_ZEROING_SPEED = 0.25;
+
+    public void SyncZeroOutLift() {
+        liftMotor.setPower(-MOTOR_ZEROING_SPEED);
+
+        while(!magneticBottomSensor.isPressed() && opMode.opModeIsActive()) {}
+
+        liftMotor.setPower(0);
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private boolean isZeroingAsync = false;
+
+    public void AsyncZeroOutLift() {
+        liftMotor.setPower(-MOTOR_ZEROING_SPEED);
+    }
+
+    public void Update() {
+        if(isZeroingAsync && magneticBottomSensor.isPressed()) {
+            liftMotor.setPower(0);
+            liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            isZeroingAsync = false;
+        }
     }
 
     public void GoToLiftStage(LiftStage liftStage) {

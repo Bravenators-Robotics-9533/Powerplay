@@ -99,6 +99,7 @@ public class Teleop extends LinearOpMode {
 
             HandleDrive();
             HandleOperatorLift();
+            liftController.Update();
 
             driverGamePad.update();
             operatorGamePad.update();
@@ -212,7 +213,7 @@ public class Teleop extends LinearOpMode {
 
             case FtcGamePad.GAMEPAD_BACK:
                 if(pressed)
-                    liftController.ResetLiftEncoder();
+                    liftController.AsyncZeroOutLift();
 
                 break;
         }
