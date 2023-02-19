@@ -106,6 +106,7 @@ public class LiftController {
 
     public void AsyncZeroOutLift() {
         liftMotor.setPower(-MOTOR_ZEROING_SPEED);
+        isZeroingAsync = true;
     }
 
     public void Update() {
