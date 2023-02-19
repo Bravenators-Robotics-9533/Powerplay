@@ -56,60 +56,57 @@ public class RedAutonomousPath extends AbstractAutonomousPath {
     @Override
     public void Run() {
 
+        // Set the beginning position
         drive.setPoseEstimate(new Pose2d(-36, -62, Math.toRadians(90)));
 
         // Engage Cone Cam
         liftController.CloseIntake();
-
         WaitMillis(500);
 
         // Synchronized Lift to Cruise Position
         liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
 
+        // Wait for cone to get off the ground
         WaitMillis(250);
 
         // Follow Trajectory to Initial Cone Drop-off
         drive.followTrajectory(lineupInitialConeTrajectory);
 
+        // Wait for lift to be completely up and robot shake to stop
         WaitMillis(1000);
 
-        // Disengage Cone Cam
+        // Drop the first cone
         liftController.OpenIntake();
 
-        // Cone Off Pole
+        // Back up from the pole
         drive.followTrajectory(comeOffPoleTrajectory);
 
         // Drive forward to get the cone unstuck
         drive.followTrajectory(pushConeForwardTrajectoryP1);
         drive.followTrajectory(pushConeForwardTrajectoryP2);
 
+        // Start to lower the lift for the cone stack
         liftController.AsyncGoToLiftPosition(440);
 
+        // Drive to cone stack
         drive.followTrajectory(driveToConeStackTrajectory);
 
-        // Hit the cone stack
+        // Lower lift to the top cone on cone stack
         liftController.AsyncGoToLiftPosition(150);
-
         WaitMillis(1000);
 
         // Grab the Cone
         liftController.CloseIntake();
-
         WaitMillis(250);
 
+        // Start lifting to the high position
         liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
 
+        // Wait for the cone to be above the cone stack
         WaitMillis(1000);
 
+        // Drive back to the high pole
         drive.followTrajectory(relineUpForConeDrop);
-
-//        WaitMillis(500);
-//
-//        liftController.GoToLiftPosition(440);
-
-//        while(opMode.opModeIsActive()) {}
-
-
     }
 
 }
