@@ -2,111 +2,74 @@ package com.bravenatorsrobtoics.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.bravenatorsrobtoics.subcomponent.LiftController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import roadrunner.trajectorysequence.TrajectorySequence;
 
 public class RedAutonomousPath extends AbstractAutonomousPath {
 
     private final LiftController liftController;
 
-    private final Trajectory lineupInitialConeTrajectory;
-
-    private final Trajectory comeOffPoleTrajectory;
-    private final Trajectory pushConeForwardTrajectoryP1;
-    private final Trajectory pushConeForwardTrajectoryP2;
-    private final Trajectory driveToConeStackTrajectory;
-
-    private final Trajectory relineUpForConeDrop;
+    private final Pose2d startPosition = new Pose2d(-36, -62, Math.toRadians(90));
+    private final TrajectorySequence trajectorySequence;
 
     public RedAutonomousPath(LinearOpMode opMode, HardwareMap hardwareMap) {
         super(opMode, hardwareMap);
 
-        // Trajectory Definitions
+        this.liftController = new LiftController(opMode);
 
-        liftController = new LiftController(opMode);
+        this.trajectorySequence = drive.trajectorySequenceBuilder(startPosition)
+                .addDisplacementMarker(liftController::CloseIntake) // Close Intake
+                .waitSeconds(0.5) // Wait for the cone to be grabbed
+                .addDisplacementMarker(() -> liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH)) // Lift to high
+                .waitSeconds(0.25) // Wait for the cone to be lifted off the ground
 
-        lineupInitialConeTrajectory = drive.trajectoryBuilder(new Pose2d(-36, -62, Math.toRadians(90)))
+                // Line up to the first cone drop
                 .lineToConstantHeading(new Vector2d(-36, -28))
-                .splineToConstantHeading(new Vector2d(-22.5, -10.5), Math.toRadians(0))
-                .build();
+                .splineToConstantHeading(new Vector2d(-22.5, -10.0f), Math.toRadians(0))
 
-        comeOffPoleTrajectory = drive.trajectoryBuilder(lineupInitialConeTrajectory.end())
+                // Wait for lift to stop shaking
+                .waitSeconds(0.5)
+
+                // Drop the cone
+                .addDisplacementMarker(liftController::OpenIntake)
+
+                // Back away from pole
                 .lineToConstantHeading(new Vector2d(-26, -15))
-                .build();
 
-        pushConeForwardTrajectoryP1 = drive.trajectoryBuilder(comeOffPoleTrajectory.end())
+                // Push initial cone away from the bot
                 .lineToConstantHeading(new Vector2d(-26, -9))
-                .build();
-
-        pushConeForwardTrajectoryP2 = drive.trajectoryBuilder(pushConeForwardTrajectoryP1.end())
                 .lineToConstantHeading(new Vector2d(-26, -15))
-                .build();
 
-        driveToConeStackTrajectory = drive.trajectoryBuilder(pushConeForwardTrajectoryP2.end())
-                .lineToSplineHeading(new Pose2d(-36 - 25, -15, Math.toRadians(180)))
-                .build();
+                // Lower the lift
+                .addDisplacementMarker(() -> liftController.AsyncGoToLiftPosition(440))
+    
+                // Drive to cone stack
+                .lineToSplineHeading(new Pose2d(-61, -15, Math.toRadians(180)))
 
-        relineUpForConeDrop = drive.trajectoryBuilder(driveToConeStackTrajectory.end())
+                // Lower the lift into the cone stack
+                .addDisplacementMarker(() -> liftController.AsyncGoToLiftPosition(150))
+                .waitSeconds(1) // Wait for the lift to go down
+
+                // Grab cone
+                .addDisplacementMarker(liftController::CloseIntake)
+                .waitSeconds(0.25) // Wait for cone to be grabbed
+
+                // Start lifting the lift to high async
+                .addDisplacementMarker(() -> liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH))
+                .waitSeconds(1000) // Wait for cone to be clear of cone stack (so as to not knock over the cones)
+
+                // Reline up for the cone grab
                 .lineToSplineHeading(new Pose2d(-22.5, -10.5, Math.toRadians(90)))
                 .build();
     }
 
     @Override
     public void Run() {
-
-        // Set the beginning position
-        drive.setPoseEstimate(new Pose2d(-36, -62, Math.toRadians(90)));
-
-        // Engage Cone Cam
-        liftController.CloseIntake();
-        WaitMillis(500);
-
-        // Synchronized Lift to Cruise Position
-        liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
-
-        // Wait for cone to get off the ground
-        WaitMillis(250);
-
-        // Follow Trajectory to Initial Cone Drop-off
-        drive.followTrajectory(lineupInitialConeTrajectory);
-
-        // Wait for lift to be completely up and robot shake to stop
-        WaitMillis(1000);
-
-        // Drop the first cone
-        liftController.OpenIntake();
-
-        // Back up from the pole
-        drive.followTrajectory(comeOffPoleTrajectory);
-
-        // Drive forward to get the cone unstuck
-        drive.followTrajectory(pushConeForwardTrajectoryP1);
-        drive.followTrajectory(pushConeForwardTrajectoryP2);
-
-        // Start to lower the lift for the cone stack
-        liftController.AsyncGoToLiftPosition(440);
-
-        // Drive to cone stack
-        drive.followTrajectory(driveToConeStackTrajectory);
-
-        // Lower lift to the top cone on cone stack
-        liftController.AsyncGoToLiftPosition(150);
-        WaitMillis(1000);
-
-        // Grab the Cone
-        liftController.CloseIntake();
-        WaitMillis(250);
-
-        // Start lifting to the high position
-        liftController.AsyncGoToLiftStage(LiftController.LiftStage.HIGH);
-
-        // Wait for the cone to be above the cone stack
-        WaitMillis(1000);
-
-        // Drive back to the high pole
-        drive.followTrajectory(relineUpForConeDrop);
+        drive.setPoseEstimate(startPosition);
+        drive.followTrajectorySequence(trajectorySequence);
     }
 
 }
