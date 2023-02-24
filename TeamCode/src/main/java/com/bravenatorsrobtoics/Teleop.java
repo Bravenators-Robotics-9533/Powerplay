@@ -103,9 +103,6 @@ public class Teleop extends LinearOpMode {
 
             driverGamePad.update();
             operatorGamePad.update();
-
-            // Update Controllers
-            liftController.RunSafetyChecks();
         }
 
     }
@@ -123,7 +120,6 @@ public class Teleop extends LinearOpMode {
 
     // Field Centric Driving
     private void HandleDrive() {
-        // TODO: Only calculate x and v with math and calculate r from imu so 180 button can be implemented
         double y = Range.clip(Math.pow(-gamepad1.left_stick_y, 3), -1.0, 1.0);
         double xt = (Math.pow(gamepad1.right_trigger, 3) - Math.pow(gamepad1.left_trigger, 3)) * (shouldUseMasterController ? 0 : 1);
         double x = Range.clip(Math.pow(gamepad1.left_stick_x, 3) + xt, -1.0, 1.0) * 1.1;
@@ -149,8 +145,7 @@ public class Teleop extends LinearOpMode {
         hardware.SetMotorPower(hardware.backLeft, backLeftPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
         hardware.SetMotorPower(hardware.backRight, backRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
 
-        telemetry.addData("Lift Right Position", liftController.liftMotorRight.getCurrentPosition());
-        telemetry.addData("Lift Left Position", liftController.liftMotorLeft.getCurrentPosition());
+        telemetry.addData("Lift Position", liftController.liftMotor.getCurrentPosition());
         telemetry.update();
     }
 
