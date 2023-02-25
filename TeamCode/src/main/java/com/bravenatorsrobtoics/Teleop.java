@@ -209,8 +209,7 @@ public class Teleop extends LinearOpMode {
 
             case FtcGamePad.GAMEPAD_BACK:
                 if(pressed)
-                    liftController.AsyncZeroOutLift();
-
+                    break;
                 break;
         }
     }

@@ -18,39 +18,8 @@ public class MeepMeepTesting {
                 .setConstraints(52.56702632542596, 52.56702632542596, 1.6772617340087892, Math.toRadians(199.46150662251654), 14.75)
                 .setDimensions(15, 16)
                 .followTrajectorySequence(drive ->
-                    drive.trajectorySequenceBuilder(new Pose2d(-36, -62, Math.toRadians(90)))
-                            .lineToConstantHeading(new Vector2d(-36, -20))
-                            .splineToConstantHeading(new Vector2d(-24, -12), Math.toRadians(0))
-
-                            // Cycle
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
-
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
-
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
-
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
-
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(180)))
-                            .waitSeconds(DROP_SECONDS)
-                            .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
-
-                            .waitSeconds(DROP_SECONDS)
-                            .splineToConstantHeading(new Vector2d(-36, -34), Math.toRadians(30))
-
+                    drive.trajectorySequenceBuilder(new Pose2d(-26, -10, Math.toRadians(90)))
+                            .splineToConstantHeading(new Vector2d(-34, -34), Math.toRadians(360))
                             .build()
                 );
 

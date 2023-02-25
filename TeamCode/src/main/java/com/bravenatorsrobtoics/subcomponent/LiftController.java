@@ -31,7 +31,7 @@ public class LiftController {
         SLIGHTLY_RAISED(210),
         LOW (575),
         MID (955),
-        HIGH(1500);
+        HIGH(1350);
 
         public final int encoderValue;
 
@@ -49,10 +49,11 @@ public class LiftController {
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
+        intakeServo.setDirection(Servo.Direction.REVERSE);
 
         magneticBottomSensor = opMode.hardwareMap.get(TouchSensor.class, "lift-sensor");
     }
@@ -82,26 +83,7 @@ public class LiftController {
 
     private static final double MOTOR_ZEROING_SPEED = 0.25;
 
-    public void SyncZeroOutLift() {
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        liftMotor.setVelocity(-MOTOR_ZEROING_SPEED * MAX_MOTOR_VELOCITY);
-
-        while(!magneticBottomSensor.isPressed() && opMode.opModeIsActive()) {}
-
-        liftMotor.setPower(0);
-
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
     private boolean isZeroingAsync = false;
-
-    public void AsyncZeroOutLift() {
-        liftMotor.setVelocity(-MOTOR_ZEROING_SPEED * MAX_MOTOR_VELOCITY);
-
-        isZeroingAsync = true;
-    }
 
     public void Update() {
         if(isZeroingAsync && magneticBottomSensor.isPressed()) {
