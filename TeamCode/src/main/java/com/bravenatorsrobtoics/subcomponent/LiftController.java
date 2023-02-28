@@ -10,14 +10,15 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 public class LiftController {
 
     private static final double MAX_MOTOR_VELOCITY = 2800;
-    private static final double INTAKE_TARGET_OPEN_POSITION = 1.0;
-    private static final double INTAKE_TARGET_CLOSED_POSITION = 0.2;
+    private static final double INTAKE_TARGET_OPEN_POSITION = 0.95;
+    private static final double INTAKE_TARGET_CLOSED_POSITION = 0.1;
 
     protected final LinearOpMode opMode;
 
     public final DcMotorEx liftMotor;
 
-    private final Servo intakeServo;
+    public final Servo intakeServo;
+    private boolean servoOpen = true;
 
     private final TouchSensor magneticBottomSensor;
 
@@ -53,23 +54,25 @@ public class LiftController {
 
         intakeServo = opMode.hardwareMap.servo.get("intake");
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
-        intakeServo.setDirection(Servo.Direction.REVERSE);
+        intakeServo.setDirection(Servo.Direction.FORWARD);
 
         magneticBottomSensor = opMode.hardwareMap.get(TouchSensor.class, "lift-sensor");
     }
 
     public void OpenIntake() {
+        servoOpen = true;
         intakeServo.setPosition(INTAKE_TARGET_OPEN_POSITION);
     }
 
     public void ToggleIntake() {
-        if(intakeServo.getPosition() == INTAKE_TARGET_CLOSED_POSITION)
-            OpenIntake();
-        else
+        if(servoOpen)
             CloseIntake();
+        else
+            OpenIntake();
     }
 
     public void CloseIntake() {
+        servoOpen = false;
         intakeServo.setPosition(INTAKE_TARGET_CLOSED_POSITION);
     }
 

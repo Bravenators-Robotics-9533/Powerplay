@@ -56,8 +56,8 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Teleop", group="Linear Opmode")
 public class Teleop extends LinearOpMode {
 
-    private static final double MAX_ROBOT_SPEED = 0.5;
-    private static final double SLOW_MODE_SPEED = 0.1;
+    private static final double MAX_ROBOT_SPEED = 0.75;
+    private static final double SLOW_MODE_SPEED = 0.2;
 
     private FtcGamePad driverGamePad;
     private FtcGamePad operatorGamePad;
@@ -146,6 +146,7 @@ public class Teleop extends LinearOpMode {
         hardware.SetMotorPower(hardware.backRight, backRightPower * (isSlowModeEnabled ? SLOW_MODE_SPEED : MAX_ROBOT_SPEED));
 
         telemetry.addData("Lift Position", liftController.liftMotor.getCurrentPosition());
+        telemetry.addData("Intake Position", liftController.intakeServo.getPosition());
         telemetry.update();
     }
 
@@ -209,7 +210,7 @@ public class Teleop extends LinearOpMode {
 
             case FtcGamePad.GAMEPAD_BACK:
                 if(pressed)
-                    break;
+                    liftController.ResetLiftEncoder();
                 break;
         }
     }
